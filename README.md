@@ -22,7 +22,7 @@ El script inicial esta en `database.sql`.
 
 Incluye:
 
-- Creacion de la base `Web2Inmobiliaria2026`
+- Creacion de la base `Lab2Inmobiliaria2026`
 - Tablas principales
 - Claves primarias y foraneas
 - Indices basicos para busquedas

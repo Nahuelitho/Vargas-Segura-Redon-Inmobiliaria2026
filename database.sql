@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS Web2Inmobiliaria2026
+CREATE DATABASE IF NOT EXISTS Lab2Inmobiliaria2026
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
 
-USE Web2Inmobiliaria2026;
+USE Lab2Inmobiliaria2026;
 
 CREATE TABLE propietarios (
   id INT NOT NULL AUTO_INCREMENT,
