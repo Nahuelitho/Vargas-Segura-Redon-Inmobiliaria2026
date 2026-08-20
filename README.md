@@ -14,6 +14,45 @@ La base de datos se llama `Lab2Inmobiliaria2026`.
 
 El script esta en `database.sql`.
 
+Para crear la base de datos desde MySQL/MariaDB:
+
+```bash
+mysql -u root -p < database.sql
+```
+
+## Instalacion y Ejecucion
+
+Requisitos:
+
+- .NET 8 SDK
+- MySQL o MariaDB
+
+Instalar/restaurar dependencias del proyecto:
+
+```bash
+dotnet restore
+```
+
+Compilar:
+
+```bash
+dotnet build
+```
+
+Correr la aplicacion:
+
+```bash
+dotnet run
+```
+
+Tambien se puede correr con recarga automatica durante desarrollo:
+
+```bash
+dotnet watch run
+```
+
+Nota: este proyecto es ASP.NET Core MVC, no usa `npm run dev`.
+
 ```mermaid
 erDiagram
     PROPIETARIOS ||--o{ INMUEBLES : posee
@@ -99,6 +138,13 @@ erDiagram
 ## Primera Etapa
 
 Por ahora vamos a trabajar con las entidades principales, sin login, roles ni auditoria.
+
+Estado actual:
+
+- Proyecto ASP.NET Core MVC creado y compilable.
+- Script SQL inicial creado en `database.sql`.
+- Modelos iniciales creados: `Propietario`, `Inquilino`, `Inmueble` y `TipoInmueble`.
+- Pendiente conectar la aplicacion con la base de datos y crear controladores/vistas para ABM.
 
 Entidades:
 
