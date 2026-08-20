@@ -4,9 +4,9 @@ Proyecto para gestionar alquileres temporarios de inmuebles de una inmobiliaria.
 
 ## Integrantes del Grupo
 
-- Nahuel Vargas - correo pendiente - GitHub pendiente - Discord pendiente
-- Esteban Redon - correo pendiente - GitHub pendiente - Discord pendiente
-- Segura Luis - correo pendiente - GitHub pendiente - Discord pendiente
+- Nahuel Vargas -
+- Esteban Redon -
+- Segura Luis -
 
 ## Base de Datos
 
