@@ -6,42 +6,42 @@ using MySqlConnector;
 public class InquilinoRepository(IConfiguration config)
 {
 
-    private readonly string _connectionString = config.GetConnectionString("DefaultConnection")!;
+    private readonly string _cadenaConexion = config.GetConnectionString("DefaultConnection")!;
 
-    private MySqlConnection CreateConnection()
+    private MySqlConnection CrearConexion()
     {
-      return new MySqlConnection(_connectionString);
+      return new MySqlConnection(_cadenaConexion);
     }
 
     public async Task<List<Inquilino>> ObtenerTodos(int pagina = 1, int limite = 10)
     {
         var inquilinos = new List<Inquilino>();
 
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
 
-        const string sql = """ 
+        const string consultaSql = """ 
         SELECT * FROM inquilinos WHERE estado = true
         LIMIT @limit OFFSET @offset;
         """;
 
-        await using var command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@limit", limite);
-        command.Parameters.AddWithValue("@offset", (pagina - 1) * limite);
-        await using var reader = await command.ExecuteReaderAsync();
+        await using var comando = new MySqlCommand(consultaSql, conexion);
+        comando.Parameters.AddWithValue("@limit", limite);
+        comando.Parameters.AddWithValue("@offset", (pagina - 1) * limite);
+        await using var lector = await comando.ExecuteReaderAsync();
 
-        while (await reader.ReadAsync())
+        while (await lector.ReadAsync())
         {
             inquilinos.Add(new Inquilino
             {
-                Id = reader.GetInt32("Id"),
-                Dni = reader.GetString("dni"),
-                Nombre = reader.GetString("nombre"),
-                Apellido = reader.GetString("apellido"),
-                Telefono = reader["telefono"] as string,
-                Email = reader["email"] as string,
-                Direccion = reader["direccion"] as string,
-                Estado = reader.GetBoolean("estado")
+                Id = lector.GetInt32("Id"),
+                Dni = lector.GetString("dni"),
+                Nombre = lector.GetString("nombre"),
+                Apellido = lector.GetString("apellido"),
+                Telefono = lector["telefono"] as string,
+                Email = lector["email"] as string,
+                Direccion = lector["direccion"] as string,
+                Estado = lector.GetBoolean("estado")
             });
         }
 
@@ -50,60 +50,60 @@ public class InquilinoRepository(IConfiguration config)
 
     public async Task<Inquilino?> ObtenerPorId(int id)
     {
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
 
-        const string sql = """ 
+        const string consultaSql = """ 
           SELECT * FROM inquilinos WHERE id = @id AND estado = true;
         """;
 
-        await using var command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        await using var comando = new MySqlCommand(consultaSql, conexion);
+        comando.Parameters.AddWithValue("@id", id);
 
-        await using var reader = await command.ExecuteReaderAsync();
+        await using var lector = await comando.ExecuteReaderAsync();
 
-        if (await reader.ReadAsync()){
+        if (await lector.ReadAsync()){
           return new Inquilino{
-            Id = reader.GetInt32("Id"),
-            Dni = reader.GetString("dni"),
-            Nombre = reader.GetString("nombre"),
-            Apellido = reader.GetString("apellido"),
-            Telefono = reader["telefono"] as string,
-            Email = reader["email"] as string,
-            Direccion = reader["direccion"] as string,
-            Estado = reader.GetBoolean("estado")
+            Id = lector.GetInt32("Id"),
+            Dni = lector.GetString("dni"),
+            Nombre = lector.GetString("nombre"),
+            Apellido = lector.GetString("apellido"),
+            Telefono = lector["telefono"] as string,
+            Email = lector["email"] as string,
+            Direccion = lector["direccion"] as string,
+            Estado = lector.GetBoolean("estado")
           };
         }
         return null;
     }
 
-    public async Task<Inquilino?> Create(Inquilino inquilino){
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
+    public async Task<Inquilino?> Crear(Inquilino inquilino){
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
 
-        const string sql = """ 
+        const string consultaSql = """ 
           INSERT INTO inquilinos (dni, nombre, apellido, telefono, email, direccion, estado)
           VALUES (@Dni, @Nombre, @Apellido, @Telefono, @Email, @Direccion, true);
           SELECT last_insert_id();
         """;
 
-        await using var command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@Dni", inquilino.Dni);
-        command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-        command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
-        command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-        command.Parameters.AddWithValue("@Email", inquilino.Email);
-        command.Parameters.AddWithValue("@Direccion", inquilino.Direccion);
+        await using var comando = new MySqlCommand(consultaSql, conexion);
+        comando.Parameters.AddWithValue("@Dni", inquilino.Dni);
+        comando.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
+        comando.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
+        comando.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
+        comando.Parameters.AddWithValue("@Email", inquilino.Email);
+        comando.Parameters.AddWithValue("@Direccion", inquilino.Direccion);
 
         try
         {
-            var newId = await command.ExecuteScalarAsync();
+            var nuevoId = await comando.ExecuteScalarAsync();
 
-            if(newId == null){
+            if(nuevoId == null){
               return null;
             }
 
-            inquilino.Id = Convert.ToInt32(newId);
+            inquilino.Id = Convert.ToInt32(nuevoId);
             return inquilino;
         }
         catch (MySqlException ex) when (ex.Number == 1062)
@@ -112,46 +112,46 @@ public class InquilinoRepository(IConfiguration config)
         }
     }
 
-    public async Task<bool> Update(Inquilino inquilino)
+    public async Task<bool> Actualizar(Inquilino inquilino)
     {
-      await using var connection = CreateConnection();
-      await connection.OpenAsync();
+      await using var conexion = CrearConexion();
+      await conexion.OpenAsync();
 
-        const string sql = """ 
+        const string consultaSql = """ 
         UPDATE inquilinos
         SET dni = @Dni, nombre = @Nombre, apellido = @Apellido, telefono = @Telefono,
         email = @Email, direccion = @Direccion
         WHERE id = @Id;
         """;
 
-        await using var command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@Id", inquilino.Id);
-        command.Parameters.AddWithValue("@Dni", inquilino.Dni);
-        command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-        command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
-        command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-        command.Parameters.AddWithValue("@Email", inquilino.Email);
-        command.Parameters.AddWithValue("@Direccion", inquilino.Direccion);
+        await using var comando = new MySqlCommand(consultaSql, conexion);
+        comando.Parameters.AddWithValue("@Id", inquilino.Id);
+        comando.Parameters.AddWithValue("@Dni", inquilino.Dni);
+        comando.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
+        comando.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
+        comando.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
+        comando.Parameters.AddWithValue("@Email", inquilino.Email);
+        comando.Parameters.AddWithValue("@Direccion", inquilino.Direccion);
 
-        var affected = await command.ExecuteNonQueryAsync();
-        return affected > 0;
+        var afectados = await comando.ExecuteNonQueryAsync();
+        return afectados > 0;
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Eliminar(int id)
     {
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
 
-        const string sql = """ 
+        const string consultaSql = """ 
         UPDATE inquilinos
         SET estado = false
         WHERE id = @Id;
         """;
 
-        await using var command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@Id", id);
+        await using var comando = new MySqlCommand(consultaSql, conexion);
+        comando.Parameters.AddWithValue("@Id", id);
 
-        var affected = await command.ExecuteNonQueryAsync();
-        return affected > 0;
+        var afectados = await comando.ExecuteNonQueryAsync();
+        return afectados > 0;
     }
 }

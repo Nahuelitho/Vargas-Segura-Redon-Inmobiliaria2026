@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace Inmobiliaria.Controllers;
 
 public class InquilinoController(
-    InquilinoRepository repository,
-    ILogger<InquilinoController> logger
+    InquilinoRepository repositorio,
+    ILogger<InquilinoController> registrador
     ) : Controller
 {
-    private readonly InquilinoRepository _repository = repository;
-    private readonly ILogger<InquilinoController> _logger = logger;
+    private readonly InquilinoRepository _repositorio = repositorio;
+    private readonly ILogger<InquilinoController> _registrador = registrador;
 
     public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
     {
-        var inquilinos = await _repository.ObtenerTodos(pagina, limite);
+        var inquilinos = await _repositorio.ObtenerTodos(pagina, limite);
 
         ViewData["PaginaActual"] = pagina;
         ViewData["TieneSiguiente"] = inquilinos.Count() == limite;
@@ -24,13 +24,13 @@ public class InquilinoController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Crear()
     {
         return View(new Inquilino());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Inquilino inquilino)
+    public async Task<IActionResult> Crear(Inquilino inquilino)
     {
         if (!ModelState.IsValid)
         {
@@ -39,8 +39,8 @@ public class InquilinoController(
 
         try
         {
-            var newInquilino = await _repository.Create(inquilino);
-            if(newInquilino == null)
+            var nuevoInquilino = await _repositorio.Crear(inquilino);
+            if(nuevoInquilino == null)
             {
                 ModelState.AddModelError(string.Empty, "Error al crear el inquilino");
                 return View(inquilino);
@@ -55,9 +55,9 @@ public class InquilinoController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> Update(int id)
+    public async Task<IActionResult> Editar(int id)
     {
-        var inquilino = await _repository.ObtenerPorId(id);
+        var inquilino = await _repositorio.ObtenerPorId(id);
         if (inquilino == null)
         {
             return NotFound();
@@ -66,42 +66,42 @@ public class InquilinoController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(Inquilino inquilino)
+    public async Task<IActionResult> Editar(Inquilino inquilino)
     {
         if (!ModelState.IsValid) return View(inquilino);
 
         try
         {
-            var update = await _repository.Update(inquilino);
-            if (update)
+            var actualizado = await _repositorio.Actualizar(inquilino);
+            if (actualizado)
             {
                 return RedirectToAction(nameof(Index));
             }
             return NotFound();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            ModelState.AddModelError(string.Empty, e.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
         }
 
         return View(inquilino);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Eliminar(int id)
     {
         try
         {
-            var ok = await _repository.Delete(id);
-            if (ok)
+            var exito = await _repositorio.Eliminar(id);
+            if (exito)
             {
                 return RedirectToAction(nameof(Index));
             }
             return NotFound();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            ModelState.AddModelError(string.Empty, e.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
         }
         return View();
     }

@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers;
 
-public class PropietarioController(PropietarioRepository repository, ILogger<PropietarioController> logger): Controller
+public class PropietarioController(PropietarioRepository repositorio, ILogger<PropietarioController> registrador): Controller
 {
-    private readonly PropietarioRepository _repository = repository;
-    private readonly ILogger<PropietarioController> _logger = logger;
+    private readonly PropietarioRepository _repositorio = repositorio;
+    private readonly ILogger<PropietarioController> _registrador = registrador;
 
     public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
     {
-        var propietarios = await _repository.ObtenerTodos(pagina, limite);
+        var propietarios = await _repositorio.ObtenerTodos(pagina, limite);
 
         ViewData["PaginaActual"] = pagina;
         ViewData["TieneSiguiente"] = propietarios.Count() == limite;
@@ -21,13 +21,13 @@ public class PropietarioController(PropietarioRepository repository, ILogger<Pro
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Crear()
     {
         return View(new Propietario());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Propietario propietario)
+    public async Task<IActionResult> Crear(Propietario propietario)
     {
       if(!ModelState.IsValid){
         return View(propietario);
@@ -35,7 +35,7 @@ public class PropietarioController(PropietarioRepository repository, ILogger<Pro
 
       try
       {
-          await _repository.Create(propietario);
+          await _repositorio.Crear(propietario);
           return RedirectToAction(nameof(Index));
       }
       catch (InvalidOperationException ex)
@@ -47,9 +47,9 @@ public class PropietarioController(PropietarioRepository repository, ILogger<Pro
     }
 
     [HttpGet]
-    public async Task<IActionResult> Update(int id)
+    public async Task<IActionResult> Editar(int id)
     {
-        var propietario = await _repository.ObtenerPorId(id);
+        var propietario = await _repositorio.ObtenerPorId(id);
         if (propietario == null)
         {
             return NotFound();
@@ -58,42 +58,42 @@ public class PropietarioController(PropietarioRepository repository, ILogger<Pro
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(Propietario propietario)
+    public async Task<IActionResult> Editar(Propietario propietario)
     {
         if (!ModelState.IsValid) return View(propietario);
 
         try
         {
-            var update = await _repository.Update(propietario); // Update retorna bool
-            if (update)
+            var actualizado = await _repositorio.Actualizar(propietario); // Update retorna bool
+            if (actualizado)
             {
                 return RedirectToAction(nameof(Index));
             }
             return NotFound();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            ModelState.AddModelError(string.Empty, e.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
         }
 
         return View(propietario);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Eliminar(int id)
     {
         try
         {
-            var ok = await _repository.Delete(id);
-            if (ok)
+            var exito = await _repositorio.Eliminar(id);
+            if (exito)
             {
                 return RedirectToAction(nameof(Index));
             }
             return NotFound();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            ModelState.AddModelError(string.Empty, e.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
         }
         return View();
     }

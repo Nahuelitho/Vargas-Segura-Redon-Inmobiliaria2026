@@ -12,16 +12,15 @@
                 Administración de propietarios
             </p>
         </div>
-        <a asp-action="Create" class="btn btn-primary">
+        <a asp-action="Crear" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i>
             Nuevo propietario
         </a>
     </div>
-    <div class="card shadow-sm rounded-3 overflow-hidden">
-        <div class="card-body p-0">
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+    <!-- Contenedor solo para la tabla con la sombra y bordes redondeados -->
+    <div class="shadow-sm rounded-3 overflow-hidden mb-4 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
 
                     <thead class="table-dark">
                         <tr>
@@ -112,13 +111,13 @@
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
 
-                                            <a asp-action="Update"
+                                            <a asp-action="Editar"
                                                asp-route-id="@propietario.Id"
                                                class="btn btn-sm btn-outline-primary">
                                                 Editar
                                             </a>
 
-                                            <form asp-action="Delete"
+                                            <form asp-action="Eliminar"
                                                   asp-route-id="@propietario.Id"
                                                   method="post"
                                                   class="d-inline">
@@ -144,7 +143,7 @@
                                         No hay propietarios registrados
                                     </h5>
 
-                                    <a asp-action="Create"
+                                    <a asp-action="Crear"
                                        class="btn btn-primary mt-2">
                                         Registrar propietario
                                     </a>
@@ -154,8 +153,12 @@
                     </tbody>
 
                 </table>
-                <div class="d-flex justify-content-between mt-3">
-                    <!-- Botón Anterior -->
+        </div>
+    </div>
+
+    <!-- Paginación totalmente independiente -->
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- Botón Anterior -->
                     @if ((int)ViewData["PaginaActual"] > 1)
                     {
                         <a asp-action="Index" asp-route-pagina="@((int)ViewData["PaginaActual"] - 1)" class="btn btn-primary">
@@ -178,11 +181,6 @@
                     {
                         <button class="btn btn-secondary" disabled>Siguiente &raquo;</button>
                     }
-                </div>
-
-            </div>
-
-        </div>
     </div>
 
 </div>
