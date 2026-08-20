@@ -1,0 +1,175 @@
+@model List<Inmobiliaria.Models.Propietario>
+
+@{
+    ViewData["Title"] = "Propietarios";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold">Propietarios</h1>
+            <p class="text-muted mb-0">
+                Administración de propietarios
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i>
+            Nuevo propietario
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>DNI</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Dirección</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            @foreach (var propietario in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(propietario.Dni))
+                                        {
+                                            <span class="fw-semibold">
+                                                @propietario.Dni
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin DNI</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if(!string.IsNullOrEmpty(propietario.Nombre)){
+                                            <span class="fw/semibold">
+                                                @propietario.Nombre
+                                            </span>
+                                        }else
+                                        {
+                                            <span class="text-muted">Sin Nombre</span>
+                                        }
+                                    </td>
+
+                                                                        <td>
+                                    @if(!string.IsNullOrEmpty(propietario.Apellido)){
+                                        <span class="fw/semibold">
+                                            @propietario.Apellido
+                                        </span>
+                                    }else
+                                    {
+                                        <span class="text-muted">Sin Apellido</span>
+                                    }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(propietario.Telefono))
+                                        {
+                                            @propietario.Telefono
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin teléfono</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(propietario.Email))
+                                        {
+                                            @propietario.Email
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin email</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(propietario.Direccion))
+                                        {
+                                            @propietario.Direccion
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin dirección</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a asp-action="Update"
+                                               asp-route-id="@propietario.Id"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Editar
+                                            </a>
+
+                                            <form asp-action="Delete"
+                                                  asp-route-id="@propietario.Id"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('¿Está seguro de eliminar este propietario?');">
+                                                    Eliminar
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <h5 class="text-muted">
+                                        No hay propietarios registrados
+                                    </h5>
+
+                                    <a asp-action="Create"
+                                       class="btn btn-primary mt-2">
+                                        Registrar propietario
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@if (Model != null)
+{
+    <pre style="background:#111; color:#0f0; padding:1rem; font-size:12px;">
+    @foreach (var p in Model)
+    {
+        @($"ID:{p.Id} | {p.Nombre} {p.Apellido} | DNI:{p.Dni}\n")
+    }
+    </pre>
+}
