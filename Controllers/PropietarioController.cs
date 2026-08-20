@@ -4,16 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers;
 
-public class PropietarioController : Controller
+public class PropietarioController(
+    PropietarioRepository repository,
+    ILogger<PropietarioController> logger
+    ) : Controller
 {
-    private readonly PropietarioRepository _repository;
-    private readonly ILogger<PropietarioController> _logger;
-
-    public PropietarioController(PropietarioRepository repository, ILogger<PropietarioController> logger)
-    {
-        _repository = repository;
-        _logger = logger;
-    }
+    private readonly PropietarioRepository _repository = repository;
+    private readonly ILogger<PropietarioController> _logger = logger;
 
     public async Task<IActionResult> Index()
     {
@@ -24,7 +21,7 @@ public class PropietarioController : Controller
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-      return View(new Propietario());
+        return View(new Propietario());
     }
 
     [HttpPost]
@@ -97,6 +94,6 @@ public class PropietarioController : Controller
             ModelState.AddModelError(string.Empty, e.Message);
         }
         return View();
-    } 
+    }
 
 }
