@@ -12,9 +12,13 @@ public class InquilinoController(
     private readonly InquilinoRepository _repository = repository;
     private readonly ILogger<InquilinoController> _logger = logger;
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
     {
-        var inquilinos = await _repository.ObtenerTodos();
+        var inquilinos = await _repository.ObtenerTodos(pagina, limite);
+
+        ViewData["PaginaActual"] = pagina;
+        ViewData["TieneSiguiente"] = inquilinos.Count() == limite;
+        ViewData["TieneAnterior"] = pagina > 1;
 
         return View(inquilinos);
     }

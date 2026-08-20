@@ -91,6 +91,31 @@
                     }    
                 </tbody>
                 </table>    
+                <div class="d-flex justify-content-between mt-3">
+                    <!-- Botón Anterior -->
+                    @if ((int)ViewData["PaginaActual"] > 1)
+                    {
+                        <a asp-action="Index" asp-route-pagina="@((int)ViewData["PaginaActual"] - 1)" class="btn btn-primary">
+                            &laquo; Anterior
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary" disabled>&laquo; Anterior</button>
+                    }
+                    <span>Página @ViewData["PaginaActual"]</span>
+                    <!-- Botón Siguiente -->
+                    @if ((bool)ViewData["TieneSiguiente"])
+                    {
+                        <a asp-action="Index" asp-route-pagina="@((int)ViewData["PaginaActual"] + 1)" class="btn btn-primary">
+                            Siguiente &raquo;
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary" disabled>Siguiente &raquo;</button>
+                    }
+                </div>
             </div>    
         </div>
     </div>

@@ -4,17 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inmobiliaria.Controllers;
 
-public class PropietarioController(
-    PropietarioRepository repository,
-    ILogger<PropietarioController> logger
-    ) : Controller
+public class PropietarioController(PropietarioRepository repository, ILogger<PropietarioController> logger): Controller
 {
     private readonly PropietarioRepository _repository = repository;
     private readonly ILogger<PropietarioController> _logger = logger;
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
     {
-        var propietarios = await _repository.ObtenerTodos();
+        var propietarios = await _repository.ObtenerTodos(pagina, limite);
+
+        ViewData["PaginaActual"] = pagina;
+        ViewData["TieneSiguiente"] = propietarios.Count() == limite;
+        ViewData["TieneAnterior"] = pagina > 1;
+
         return View(propietarios);
     }
 

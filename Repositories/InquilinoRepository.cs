@@ -13,7 +13,7 @@ public class InquilinoRepository(IConfiguration config)
       return new MySqlConnection(_connectionString);
     }
 
-    public async Task<List<Inquilino>> ObtenerTodos()
+    public async Task<List<Inquilino>> ObtenerTodos(int pagina = 1, int limite = 10)
     {
         var inquilinos = new List<Inquilino>();
 
@@ -21,10 +21,13 @@ public class InquilinoRepository(IConfiguration config)
         await connection.OpenAsync();
 
         const string sql = """ 
-        SELECT * FROM inquilinos WHERE estado = true;
+        SELECT * FROM inquilinos WHERE estado = true
+        LIMIT @limit OFFSET @offset;
         """;
 
         await using var command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@limit", limite);
+        command.Parameters.AddWithValue("@offset", (pagina - 1) * limite);
         await using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())

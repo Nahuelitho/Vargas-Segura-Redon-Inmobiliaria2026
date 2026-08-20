@@ -14,7 +14,7 @@ public class PropietarioRepository(IConfiguration config)
   }
 
   // LISTAR
-  public async Task<List<Propietario>> ObtenerTodos()
+  public async Task<List<Propietario>> ObtenerTodos(int paginaActual = 1, int limite = 10)
   {
         var propietarios = new List<Propietario>();
 
@@ -25,9 +25,12 @@ public class PropietarioRepository(IConfiguration config)
         SELECT Id, Dni, Nombre, Apellido, Telefono, Email, Direccion, Estado
         FROM Propietarios
         WHERE Estado = true
+        LIMIT @limit OFFSET @offset
         """;
 
         await using var command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@limit", limite);
+        command.Parameters.AddWithValue("@offset", (paginaActual - 1) * limite);
         await using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
