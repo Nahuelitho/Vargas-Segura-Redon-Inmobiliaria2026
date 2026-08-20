@@ -17,13 +17,13 @@ public class Inquilino
     public string Apellido { get; set; } = "";
 
     [Required]
-    public string? Telefono { get; set; } = "";
+    public string Telefono { get; set; } = "";
 
     [Required]
-    public string? Email { get; set; } = "";
+    public string Email { get; set; } = "";
 
     [Required]
-    public string? Direccion { get; set; } = "";
+    public string Direccion { get; set; } = "";
 
     public bool Estado { get; set; }
 }

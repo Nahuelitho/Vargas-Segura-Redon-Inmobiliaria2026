@@ -41,9 +41,9 @@ public class PropietarioRepository(IConfiguration config)
                 Dni      = lector.GetString("dni"),
                 Nombre   = lector.GetString("nombre"),
                 Apellido = lector.GetString("apellido"),
-                Telefono = lector["telefono"] as string,
-                Email    = lector["email"] as string,
-                Direccion= lector["direccion"] as string,
+                Telefono = lector["telefono"]?.ToString() ?? "",
+                Email    = lector["email"]?.ToString() ?? "",
+                Direccion= lector["direccion"]?.ToString() ?? "",
                 Estado   = lector.GetBoolean("estado")
             });
         }
@@ -72,9 +72,9 @@ public class PropietarioRepository(IConfiguration config)
                 Dni = lector.GetString("dni"),
                 Nombre = lector.GetString("nombre"),
                 Apellido = lector.GetString("apellido"),
-                Telefono = lector["telefono"] as string,
-                Email = lector["email"] as string,
-                Direccion = lector["direccion"] as string,
+                Telefono = lector["telefono"]?.ToString() ?? "",
+                Email = lector["email"]?.ToString() ?? "",
+                Direccion = lector["direccion"]?.ToString() ?? "",
                 Estado = lector.GetBoolean("estado")
             };
         }
