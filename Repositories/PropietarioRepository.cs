@@ -4,14 +4,9 @@ using MySqlConnector;
 
 namespace Inmobiliaria.Repositories;
 
-public class PropietarioRepository
+public class PropietarioRepository(IConfiguration config)
 {
-  private readonly string _connectionString;
-
-  public PropietarioRepository(IConfiguration config)
-  {
-    _connectionString = config.GetConnectionString("DefaultConnection")!;
-  }
+  private readonly string _connectionString = config.GetConnectionString("DefaultConnection")!;
 
   private MySqlConnection CreateConnection()
   {
@@ -26,7 +21,7 @@ public class PropietarioRepository
         await using var connection = CreateConnection();
         await connection.OpenAsync();
 
-        var sql = """
+        const string sql = """
         SELECT Id, Dni, Nombre, Apellido, Telefono, Email, Direccion, Estado
         FROM Propietarios
         WHERE Estado = true

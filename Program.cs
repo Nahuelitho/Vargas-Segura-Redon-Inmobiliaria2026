@@ -11,6 +11,7 @@ builder.Logging.AddDebug();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<PropietarioRepository>();
+builder.Services.AddScoped<InquilinoRepository>();
 
 var app = builder.Build();
 
