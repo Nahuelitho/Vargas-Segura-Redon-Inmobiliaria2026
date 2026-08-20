@@ -1,0 +1,80 @@
+@model Inquilino
+
+@{
+  ViewData["Title"] = "Agregar inquilino";
+}
+
+<div class="container mb-4">
+  
+    <div class="mb-4">
+        <h1>Agregar inquilino</h1>
+        <p class="text-muted">
+            Complete los datos del inquilino
+        </p>
+    </div>
+  
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Crear" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Dni" class="form-label">
+                            DNI
+                        </label>
+                        <input asp-for="Dni" placeholder="Ingrese el DNI" class="form-control">
+                        <span asp-validation-for="Dni" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Nombre" class="form-label">
+                            Nombre
+                        </label>
+                        <input asp-for="Nombre" placeholder="Ingrese el nombre" class="form-control">
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Apellido" class="form-label">
+                            Apellido
+                        </label>
+                        <input asp-for="Apellido" placeholder="Ingrese el apellido" class="form-control">
+                        <span asp-validation-for="Apellido" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Telefono" class="form-label">
+                            Teléfono
+                        </label>
+                        <input asp-for="Telefono" placeholder="Ingrese el teléfono" class="form-control">
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">
+                            Email
+                        </label>
+                        <input asp-for="Email" placeholder="Ingrese el email" class="form-control">
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Direccion" class="form-label">
+                            Dirección
+                        </label>
+                        <input asp-for="Direccion" placeholder="Ingrese la dirección" class="form-control">
+                        <span asp-validation-for="Direccion" class="text-danger"></span>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar inquilino</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

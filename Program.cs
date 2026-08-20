@@ -1,7 +1,17 @@
+using Inmobiliaria.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Evitar el error de permisos con Windows Event Log en desarrollo
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<PropietarioRepository>();
+builder.Services.AddScoped<InquilinoRepository>();
 
 var app = builder.Build();
 
