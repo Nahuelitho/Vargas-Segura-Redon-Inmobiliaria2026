@@ -1,0 +1,18 @@
+@model Inmueble
+@{
+    ViewData["Title"] = "Editar inmueble";
+}
+<h1>Editar inmueble</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Editar" method="post"><input asp-for="Id" type="hidden" />
+            <partial name="_Formulario" model="Model" />
+            <div class="mt-4 text-end"><a asp-action="Index" class="btn btn-secondary">Cancelar</a><button
+                class="btn btn-primary">Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }

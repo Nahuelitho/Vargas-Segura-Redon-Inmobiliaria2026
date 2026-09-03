@@ -1,0 +1,47 @@
+@model List<Inmueble>
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>Inmuebles</h1>
+        <p class="text-muted mb-0">Administración de propiedades</p>
+    </div><a asp-action="Crear" class="btn btn-primary">Nuevo inmueble</a>
+</div>
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover mb-0">
+        <thead class="table-dark">
+            <tr>
+                <th>Dirección</th>
+                <th>Tipo</th>
+                <th>Propietario</th>
+                <th>Precio/día</th>
+                <th>Disponible</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>@foreach(var i in Model){
+            <tr>
+                <td>@i.Direccion</td>
+                <td>@i.Tipo?.Descripcion</td>
+                <td>@i.Propietario?.Nombre @i.Propietario?.Apellido</td>
+                <td>@i.PrecioPorDia.ToString("C")</td>
+                <td>@(i.Disponible ? "Sí" : "No")</td>
+                <td class="text-end"><a asp-action="Detalles" asp-route-id="@i.Id"
+                                            class="btn btn-sm btn-outline-secondary">Detalles</a> <a asp-action="Editar"
+                                                                             asp-route-id="@i.Id" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <form asp-action="Eliminar" asp-route-id="@i.Id" method="post" class="d-inline"><button
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('¿Eliminar este inmueble?')">Eliminar</button></form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center py-4">No hay inmuebles registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,19 @@
+@model TipoInmueble
+@{
+    ViewData["Title"] = "Detalle del tipo";
+}
+<h1>Detalle del tipo de inmueble</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Identificador</dt>
+            <dd class="col-sm-9">@Model.Id</dd>
+            <dt class="col-sm-3">Descripción</dt>
+            <dd class="col-sm-9">@Model.Descripcion</dd>
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@(Model.Estado ? "Activo" : "Inactivo")</dd>
+        </dl>
+    </div>
+    <div class="card-footer text-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Editar"
+                                                                                                       asp-route-id="@Model.Id" class="btn btn-primary">Editar</a></div>
+    </div>
