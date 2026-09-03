@@ -1,0 +1,74 @@
+@model Reserva
+@{
+    ViewData["Title"] = "Nueva reserva";
+}
+
+<h1>Nueva reserva</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Crear" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="IdInquilino" class="form-label">Inquilino</label>
+                    <select asp-for="IdInquilino" asp-items="ViewBag.Inquilinos" class="form-select">
+                        <option value="">Seleccione...</option>
+                    </select>
+                    <span asp-validation-for="IdInquilino" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-6">
+                    <label asp-for="IdInmueble" class="form-label">Inmueble</label>
+                    <select asp-for="IdInmueble" asp-items="ViewBag.Inmuebles" class="form-select">
+                        <option value="">Seleccione...</option>
+                    </select>
+                    <span asp-validation-for="IdInmueble" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
+                    <input asp-for="FechaInicio" class="form-control" />
+                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="FechaFin" class="form-label">Fecha de fin</label>
+                    <input asp-for="FechaFin" class="form-control" />
+                    <span asp-validation-for="FechaFin" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="MontoPorDia" class="form-label">Monto por día</label>
+                    <input asp-for="MontoPorDia" class="form-control" />
+                    <span asp-validation-for="MontoPorDia" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="FechaTerminacion" class="form-label">Fecha de terminación</label>
+                    <input asp-for="FechaTerminacion" class="form-control" />
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="Multa" class="form-label">Multa</label>
+                    <input asp-for="Multa" class="form-control" />
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="IdReservaOrigen" class="form-label">Reserva de origen</label>
+                    <input asp-for="IdReservaOrigen" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

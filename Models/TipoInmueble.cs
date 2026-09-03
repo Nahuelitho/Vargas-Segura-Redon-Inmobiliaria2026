@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Inmobiliaria.Models;
 
 public class TipoInmueble
