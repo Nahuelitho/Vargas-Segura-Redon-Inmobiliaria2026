@@ -1,0 +1,32 @@
+@model Inmueble
+@{
+    ViewData["Title"] = "Detalle del inmueble";
+}
+<h1>Detalle del inmueble</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Dirección</dt>
+            <dd class="col-sm-8">@Model.Direccion</dd>
+            <dt class="col-sm-4">Propietario</dt>
+            <dd class="col-sm-8">@Model.Propietario?.Nombre @Model.Propietario?.Apellido</dd>
+            <dt class="col-sm-4">Tipo</dt>
+            <dd class="col-sm-8">@Model.Tipo?.Descripcion</dd>
+            <dt class="col-sm-4">Cupo</dt>
+            <dd class="col-sm-8">@Model.Cupo</dd>
+            <dt class="col-sm-4">Precio por día</dt>
+            <dd class="col-sm-8">@Model.PrecioPorDia?.ToString("C")</dd>
+            <dt class="col-sm-4">Porcentaje de reserva</dt>
+            <dd class="col-sm-8">@Model.PorcentajeReserva%</dd>
+            <dt class="col-sm-4">Coordenadas</dt>
+            <dd class="col-sm-8">@Model.Coordenadas</dd>
+            <dt class="col-sm-4">Disponible</dt>
+            <dd class="col-sm-8">@(Model.Disponible ? "Sí" : "No")</dd>
+        </dl>@if(!string.IsNullOrWhiteSpace(Model.ImagenPortada)){
+        <img src="@Model.ImagenPortada" alt="@Model.Direccion"
+             class="img-fluid rounded mt-3" style="max-height:300px" />
+    }
+</div>
+<div class="card-footer text-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Editar"
+                                                                                                   asp-route-id="@Model.Id" class="btn btn-primary">Editar</a></div>
+</div>
