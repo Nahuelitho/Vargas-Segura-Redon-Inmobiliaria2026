@@ -41,19 +41,20 @@
                 
                 <div class="col-md-4">
                     <label asp-for="PrecioPorDia" class="form-label">Precio por día</label>
-                    <input asp-for="PrecioPorDia" class="form-control" />
+                    <input asp-for="PrecioPorDia" class="form-control" data-val-number="Ingrese un numero valido" />
                     <span asp-validation-for="PrecioPorDia" class="text-danger"></span>
                 </div>
                 
                 <div class="col-md-4">
                     <label asp-for="PorcentajeReserva" class="form-label">Porcentaje de reserva</label>
-                    <input asp-for="PorcentajeReserva" class="form-control" />
+                    <input asp-for="PorcentajeReserva" class="form-control" data-val-number="Ingrese un numero valido" />
                     <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
                 </div>
                 
                 <div class="col-md-4">
                     <label asp-for="Coordenadas" class="form-label">Coordenadas</label>
                     <input asp-for="Coordenadas" class="form-control" />
+                    <span asp-validation-for="Coordenadas" class="text-danger"></span>
                 </div>
                 
                 <div class="col-md-8">

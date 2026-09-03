@@ -49,7 +49,7 @@ public class InmuebleRepository(IConfiguration config)
     private static void CargarParametros(MySqlCommand c, Inmueble i)
     {
         c.Parameters.AddWithValue("@propietario", i.IdPropietario); c.Parameters.AddWithValue("@tipo", i.IdTipo); c.Parameters.AddWithValue("@direccion", i.Direccion); c.Parameters.AddWithValue("@cupo", i.Cupo);
-        c.Parameters.AddWithValue("@coordenadas", (object?)i.Coordenadas ?? DBNull.Value); c.Parameters.AddWithValue("@precio", i.PrecioPorDia); c.Parameters.AddWithValue("@porcentaje", i.PorcentajeReserva);
+        c.Parameters.AddWithValue("@coordenadas", (object?)i.Coordenadas ?? DBNull.Value); c.Parameters.AddWithValue("@precio", (object?)i.PrecioPorDia ?? DBNull.Value); c.Parameters.AddWithValue("@porcentaje", (object?)i.PorcentajeReserva ?? DBNull.Value);
         c.Parameters.AddWithValue("@imagen", (object?)i.ImagenPortada ?? DBNull.Value); c.Parameters.AddWithValue("@disponible", i.Disponible);
     }
     private static Inmueble Mapear(MySqlDataReader l) => new() { Id=l.GetInt32("id"), IdPropietario=l.GetInt32("id_propietario"), IdTipo=l.GetInt32("id_tipo"), Direccion=l.GetString("direccion"), Cupo=l.GetInt32("cupo"), Coordenadas=l["coordenadas"]?.ToString(), PrecioPorDia=l.GetDecimal("precio_por_dia"), PorcentajeReserva=l.GetDecimal("porcentaje_reserva"), ImagenPortada=l["imagen_portada"]?.ToString(), Disponible=l.GetBoolean("disponible"), Estado=l.GetBoolean("estado"), Propietario=new Propietario { Nombre=l.GetString("propietario_nombre"), Apellido=l.GetString("propietario_apellido") }, Tipo=new TipoInmueble { Descripcion=l.GetString("tipo_descripcion") } };

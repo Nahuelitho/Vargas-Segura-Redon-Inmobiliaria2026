@@ -25,7 +25,7 @@
                 <td>@i.Direccion</td>
                 <td>@i.Tipo?.Descripcion</td>
                 <td>@i.Propietario?.Nombre @i.Propietario?.Apellido</td>
-                <td>@i.PrecioPorDia.ToString("C")</td>
+                <td>@i.PrecioPorDia?.ToString("C")</td>
                 <td>@(i.Disponible ? "Sí" : "No")</td>
                 <td class="text-end"><a asp-action="Detalles" asp-route-id="@i.Id"
                                             class="btn btn-sm btn-outline-secondary">Detalles</a> <a asp-action="Editar"
