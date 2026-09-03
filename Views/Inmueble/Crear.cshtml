@@ -1,0 +1,82 @@
+@model Inmueble
+@{
+    ViewData["Title"] = "Nuevo inmueble";
+}
+
+<h1>Nuevo inmueble</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Crear" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="IdPropietario" class="form-label">Propietario</label>
+                    <select asp-for="IdPropietario" asp-items="ViewBag.Propietarios" class="form-select">
+                        <option value="">Seleccione...</option>
+                    </select>
+                    <span asp-validation-for="IdPropietario" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-6">
+                    <label asp-for="IdTipo" class="form-label">Tipo de inmueble</label>
+                    <select asp-for="IdTipo" asp-items="ViewBag.Tipos" class="form-select">
+                        <option value="">Seleccione...</option>
+                    </select>
+                    <span asp-validation-for="IdTipo" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-8">
+                    <label asp-for="Direccion" class="form-label">Dirección</label>
+                    <input asp-for="Direccion" class="form-control" />
+                    <span asp-validation-for="Direccion" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="Cupo" class="form-label">Cupo</label>
+                    <input asp-for="Cupo" class="form-control" />
+                    <span asp-validation-for="Cupo" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="PrecioPorDia" class="form-label">Precio por día</label>
+                    <input asp-for="PrecioPorDia" class="form-control" />
+                    <span asp-validation-for="PrecioPorDia" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="PorcentajeReserva" class="form-label">Porcentaje de reserva</label>
+                    <input asp-for="PorcentajeReserva" class="form-control" />
+                    <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
+                </div>
+                
+                <div class="col-md-4">
+                    <label asp-for="Coordenadas" class="form-label">Coordenadas</label>
+                    <input asp-for="Coordenadas" class="form-control" />
+                </div>
+                
+                <div class="col-md-8">
+                    <label asp-for="ImagenPortada" class="form-label">URL de imagen de portada</label>
+                    <input asp-for="ImagenPortada" class="form-control" />
+                </div>
+                
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="Disponible" class="form-check-input" />
+                        <label asp-for="Disponible" class="form-check-label">Disponible</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

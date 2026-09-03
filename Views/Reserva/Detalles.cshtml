@@ -1,0 +1,29 @@
+@model Reserva
+@{
+    ViewData["Title"] = "Detalle de la reserva";
+}
+<h1>Detalle de la reserva</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Identificador</dt>
+            <dd class="col-sm-8">@Model.Id</dd>
+            <dt class="col-sm-4">Inquilino</dt>
+            <dd class="col-sm-8">@Model.Inquilino?.Nombre @Model.Inquilino?.Apellido</dd>
+            <dt class="col-sm-4">Inmueble</dt>
+            <dd class="col-sm-8">@Model.Inmueble?.Direccion</dd>
+            <dt class="col-sm-4">Período</dt>
+            <dd class="col-sm-8">@Model.FechaInicio.ToShortDateString() al @Model.FechaFin.ToShortDateString()</dd>
+            <dt class="col-sm-4">Monto por día</dt>
+            <dd class="col-sm-8">@Model.MontoPorDia.ToString("C")</dd>
+            <dt class="col-sm-4">Fecha de terminación</dt>
+            <dd class="col-sm-8">@(Model.FechaTerminacion?.ToShortDateString() ?? "Sin finalizar")</dd>
+            <dt class="col-sm-4">Multa</dt>
+            <dd class="col-sm-8">@(Model.Multa?.ToString("C") ?? "No aplica")</dd>
+            <dt class="col-sm-4">Reserva de origen</dt>
+            <dd class="col-sm-8">@(Model.IdReservaOrigen?.ToString() ?? "No aplica")</dd>
+        </dl>
+    </div>
+    <div class="card-footer text-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Editar"
+                                                                                                       asp-route-id="@Model.Id" class="btn btn-primary">Editar</a></div>
+    </div>
