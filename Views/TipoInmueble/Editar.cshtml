@@ -1,17 +1,45 @@
 @model TipoInmueble
+
 @{
     ViewData["Title"] = "Editar tipo de inmueble";
 }
+
 <h1>Editar tipo de inmueble</h1>
+
 <div class="card shadow-sm">
     <div class="card-body">
-        <form asp-action="Editar" method="post"><input asp-for="Id" type="hidden" />
-            <partial name="_Formulario" model="Model" />
-            <div class="mt-4 text-end"><a asp-action="Index" class="btn btn-secondary">Cancelar</a><button
-                class="btn btn-primary">Guardar cambios</button></div>
-            </form>
-        </div>
+
+        <form asp-action="Editar" method="post">
+
+            <input asp-for="Id" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label">
+                    Descripción
+                </label>
+
+                <input asp-for="Descripcion" class="form-control" autofocus />
+
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4 text-end">
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Guardar cambios
+                </button>
+            </div>
+
+        </form>
+
     </div>
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
