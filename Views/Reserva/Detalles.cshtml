@@ -15,7 +15,7 @@
             <dt class="col-sm-4">Período</dt>
             <dd class="col-sm-8">@Model.FechaInicio.ToShortDateString() al @Model.FechaFin.ToShortDateString()</dd>
             <dt class="col-sm-4">Monto por día</dt>
-            <dd class="col-sm-8">@Model.MontoPorDia.ToString("C")</dd>
+            <dd class="col-sm-8">@Model.MontoPorDia?.ToString("C")</dd>
             <dt class="col-sm-4">Fecha de terminación</dt>
             <dd class="col-sm-8">@(Model.FechaTerminacion?.ToShortDateString() ?? "Sin finalizar")</dd>
             <dt class="col-sm-4">Multa</dt>
