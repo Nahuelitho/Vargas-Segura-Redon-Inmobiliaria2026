@@ -9,13 +9,18 @@ public class PropietarioController(PropietarioRepository repositorio, ILogger<Pr
     private readonly PropietarioRepository _repositorio = repositorio;
     private readonly ILogger<PropietarioController> _registrador = registrador;
 
-    public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
     {
         var propietarios = await _repositorio.ObtenerTodos(pagina, limite);
+        var cantidadTotal = await _repositorio.ObtenerCantidad();
+
 
         ViewData["PaginaActual"] = pagina;
+         ViewData["Limite"] = limite;
+        ViewData["CantidadTotal"] = cantidadTotal;
         ViewData["TieneSiguiente"] = propietarios.Count() == limite;
         ViewData["TieneAnterior"] = pagina > 1;
+        ViewData["TienePaginacion"] = cantidadTotal > limite;
 
         return View(propietarios);
     }
