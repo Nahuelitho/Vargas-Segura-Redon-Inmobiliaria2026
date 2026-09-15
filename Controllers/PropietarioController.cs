@@ -9,6 +9,12 @@ public class PropietarioController(PropietarioRepository repositorio, ILogger<Pr
     private readonly PropietarioRepository _repositorio = repositorio;
     private readonly ILogger<PropietarioController> _registrador = registrador;
 
+    [HttpGet]
+    public async Task<IActionResult> Buscar(string? termino)
+    {
+        var resultados = await _repositorio.Buscar(termino);
+        return Json(new { resultados = resultados.Take(20), hayMas = resultados.Count > 20 });
+    }
     public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
     {
         var propietarios = await _repositorio.ObtenerTodos(pagina, limite);

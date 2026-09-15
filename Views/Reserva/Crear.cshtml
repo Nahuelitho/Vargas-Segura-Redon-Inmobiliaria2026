@@ -12,6 +12,12 @@
             
             <div class="row g-3">
                 <div class="col-md-6">
+                    <label for="BuscarInquilino" class="form-label">Buscar por DNI o nombre</label>
+                    <input id="BuscarInquilino" type="search" class="form-control mb-2"
+                           placeholder="Buscar por DNI o nombre" maxlength="100" autocomplete="off"
+                           data-busqueda-url="@Url.Action("Buscar", "Inquilino")"
+                           data-busqueda-select="IdInquilino" aria-describedby="EstadoInquilino" />
+                    <p id="EstadoInquilino" class="form-text" role="status" aria-live="polite">Escribí al menos 2 caracteres.</p>
                     <label asp-for="IdInquilino" class="form-label">Inquilino</label>
                     <select asp-for="IdInquilino" asp-items="ViewBag.Inquilinos" class="form-select">
                         <option value="">Seleccione...</option>
@@ -20,6 +26,12 @@
                 </div>
                 
                 <div class="col-md-6">
+                    <label for="BuscarInmueble" class="form-label">Buscar por dirección</label>
+                    <input id="BuscarInmueble" type="search" class="form-control mb-2"
+                           placeholder="Buscar por dirección" maxlength="100" autocomplete="off"
+                           data-busqueda-url="@Url.Action("Buscar", "Inmueble")"
+                           data-busqueda-select="IdInmueble" aria-describedby="EstadoInmueble" />
+                    <p id="EstadoInmueble" class="form-text" role="status" aria-live="polite">Escribí al menos 2 caracteres.</p>
                     <label asp-for="IdInmueble" class="form-label">Inmueble</label>
                     <select asp-for="IdInmueble" asp-items="ViewBag.Inmuebles" class="form-select">
                         <option value="">Seleccione...</option>

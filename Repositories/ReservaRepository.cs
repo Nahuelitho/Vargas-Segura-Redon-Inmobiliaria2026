@@ -7,17 +7,64 @@ public class ReservaRepository(IConfiguration config)
 {
     private readonly string _cadenaConexion = config.GetConnectionString("DefaultConnection")!;
     private MySqlConnection CrearConexion() => new(_cadenaConexion);
-    public async Task<List<Reserva>> ObtenerTodos()
+    public async Task<List<Reserva>> ObtenerTodos(int paginaActual = 1, int? limite = null)
     {
         var reservas = new List<Reserva>(); await using var c = CrearConexion(); await c.OpenAsync();
-        const string sql = "SELECT r.*, i.nombre inquilino_nombre, i.apellido inquilino_apellido, m.direccion inmueble_direccion FROM reservas r JOIN inquilinos i ON i.id=r.id_inquilino JOIN inmuebles m ON m.id=r.id_inmueble WHERE r.estado=true ORDER BY r.fecha_inicio DESC";
-        await using var cmd = new MySqlCommand(sql,c); await using var l=await cmd.ExecuteReaderAsync(); while(await l.ReadAsync()) reservas.Add(Mapear(l)); return reservas;
+        var sql = "SELECT r.*, i.nombre inquilino_nombre, i.apellido inquilino_apellido, m.direccion inmueble_direccion FROM reservas r JOIN inquilinos i ON i.id=r.id_inquilino JOIN inmuebles m ON m.id=r.id_inmueble WHERE r.estado=true ORDER BY r.fecha_inicio DESC, r.id DESC";
+        // Sin limite se conserva el listado completo para los selectores de los formularios.
+        if (limite.HasValue) sql += " LIMIT @limit OFFSET @offset";
+        await using var cmd = new MySqlCommand(sql,c);
+        if (limite.HasValue)
+        {
+            cmd.Parameters.AddWithValue("@limit", limite.Value);
+            cmd.Parameters.AddWithValue("@offset", (long)(paginaActual - 1) * limite.Value);
+        }
+        await using var l=await cmd.ExecuteReaderAsync(); while(await l.ReadAsync()) reservas.Add(Mapear(l)); return reservas;
+    }
+    public async Task<int> ObtenerCantidad()
+    {
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        const string sql = "SELECT COUNT(*) FROM reservas r JOIN inquilinos i ON i.id=r.id_inquilino JOIN inmuebles m ON m.id=r.id_inmueble WHERE r.estado=true";
+        await using var comando = new MySqlCommand(sql, conexion);
+        return Convert.ToInt32(await comando.ExecuteScalarAsync());
     }
     public async Task<Reserva?> ObtenerPorId(int id)
     {
         await using var c=CrearConexion(); await c.OpenAsync(); const string sql="SELECT r.*, i.nombre inquilino_nombre, i.apellido inquilino_apellido, m.direccion inmueble_direccion FROM reservas r JOIN inquilinos i ON i.id=r.id_inquilino JOIN inmuebles m ON m.id=r.id_inmueble WHERE r.id=@id AND r.estado=true";
         await using var cmd=new MySqlCommand(sql,c); cmd.Parameters.AddWithValue("@id",id); await using var l=await cmd.ExecuteReaderAsync(); return await l.ReadAsync()?Mapear(l):null;
     }
+    public async Task<bool> TieneSuperposicion(
+    int idInmueble,
+    DateTime fechaInicio,
+    DateTime fechaFin,
+    int? idReservaExcluir = null)
+{
+    await using var conexion = CrearConexion();
+    await conexion.OpenAsync();
+
+    const string sql = """
+        SELECT EXISTS(
+            SELECT 1
+            FROM reservas
+            WHERE id_inmueble = @idInmueble
+              AND estado = true
+              AND fecha_inicio <= @fechaFin
+              AND COALESCE(fecha_terminacion, fecha_fin) >= @fechaInicio
+              AND (@idReservaExcluir IS NULL OR id <> @idReservaExcluir)
+        );
+        """;
+
+    await using var comando = new MySqlCommand(sql, conexion);
+    comando.Parameters.AddWithValue("@idInmueble", idInmueble);
+    comando.Parameters.AddWithValue("@fechaInicio", fechaInicio.Date);
+    comando.Parameters.AddWithValue("@fechaFin", fechaFin.Date);
+    comando.Parameters.AddWithValue(
+        "@idReservaExcluir",
+        (object?)idReservaExcluir ?? DBNull.Value);
+
+    return Convert.ToBoolean(await comando.ExecuteScalarAsync());
+}
     public async Task<int> Crear(Reserva r) { await using var c=CrearConexion(); await c.OpenAsync(); const string sql="INSERT INTO reservas (id_inquilino,id_inmueble,fecha_inicio,fecha_fin,monto_por_dia,fecha_terminacion,multa,id_reserva_origen,estado) VALUES (@inquilino,@inmueble,@inicio,@fin,@monto,@terminacion,@multa,@origen,true); SELECT LAST_INSERT_ID();"; await using var cmd=new MySqlCommand(sql,c); Cargar(cmd,r); return Convert.ToInt32(await cmd.ExecuteScalarAsync()); }
     public async Task<bool> Actualizar(Reserva r) { await using var c=CrearConexion(); await c.OpenAsync(); const string sql="UPDATE reservas SET id_inquilino=@inquilino,id_inmueble=@inmueble,fecha_inicio=@inicio,fecha_fin=@fin,monto_por_dia=@monto,fecha_terminacion=@terminacion,multa=@multa,id_reserva_origen=@origen WHERE id=@id AND estado=true"; await using var cmd=new MySqlCommand(sql,c); cmd.Parameters.AddWithValue("@id",r.Id); Cargar(cmd,r); return await cmd.ExecuteNonQueryAsync()>0; }
     public async Task<bool> Eliminar(int id) { await using var c=CrearConexion(); await c.OpenAsync(); await using var cmd=new MySqlCommand("UPDATE reservas SET estado=false WHERE id=@id",c); cmd.Parameters.AddWithValue("@id",id); return await cmd.ExecuteNonQueryAsync()>0; }

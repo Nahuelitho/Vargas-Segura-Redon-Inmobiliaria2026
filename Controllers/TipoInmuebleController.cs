@@ -6,7 +6,22 @@ namespace Inmobiliaria.Controllers;
 
 public class TipoInmuebleController(TipoInmuebleRepository repositorio) : Controller
 {
-    public async Task<IActionResult> Index() => View(await repositorio.ObtenerTodos());
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
+    {
+        limite = limite > 0 ? limite : 6;
+        var cantidadTotal = await repositorio.ObtenerCantidad();
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling((double)cantidadTotal / limite));
+        pagina = Math.Clamp(pagina, 1, totalPaginas);
+        var registros = await repositorio.ObtenerTodos(pagina, limite);
+
+        ViewData["PaginaActual"] = pagina;
+        ViewData["Limite"] = limite;
+        ViewData["CantidadTotal"] = cantidadTotal;
+        ViewData["TieneSiguiente"] = pagina < totalPaginas;
+        ViewData["TieneAnterior"] = pagina > 1;
+        ViewData["TienePaginacion"] = cantidadTotal > limite;
+        return View(registros);
+    }
     public IActionResult Crear() => View(new TipoInmueble());
     [HttpPost] public async Task<IActionResult> Crear(TipoInmueble tipo) => await Guardar(tipo, false);
     public async Task<IActionResult> Editar(int id) => await repositorio.ObtenerPorId(id) is { } tipo ? View(tipo) : NotFound();
