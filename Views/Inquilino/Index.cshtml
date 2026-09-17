@@ -78,9 +78,12 @@
                                 </td>
                                 <td>
                                     <a asp-action="Editar" asp-route-id="@inquilino.Id" class="btn btn-sm btn-outline-warning">Editar</a>
-                                    <form asp-action="Eliminar" asp-route-id="@inquilino.Id" method="post" class="d-inline">
+                                    @if (User.IsInRole(Roles.Administrador))
+                    {
+<form asp-action="Eliminar" asp-route-id="@inquilino.Id" method="post" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Está seguro de que desea eliminar este inquilino?')">Eliminar</button>
                                     </form>
+                    }
                                 </td>
                             </tr>
                         }
@@ -94,30 +97,5 @@
         </div>
     </div>
 
-    <!-- Paginación totalmente independiente -->
-    <div class="d-flex justify-content-between align-items-center">
-        <!-- Botón Anterior -->
-                    @if ((int)ViewData["PaginaActual"] > 1)
-                    {
-                        <a asp-action="Index" asp-route-pagina="@((int)ViewData["PaginaActual"] - 1)" class="btn btn-primary">
-                            &laquo; Anterior
-                        </a>
-                    }
-                    else
-                    {
-                        <button class="btn btn-secondary" disabled>&laquo; Anterior</button>
-                    }
-                    <span>Página @ViewData["PaginaActual"]</span>
-                    <!-- Botón Siguiente -->
-                    @if ((bool)ViewData["TieneSiguiente"])
-                    {
-                        <a asp-action="Index" asp-route-pagina="@((int)ViewData["PaginaActual"] + 1)" class="btn btn-primary">
-                            Siguiente &raquo;
-                        </a>
-                    }
-                    else
-                    {
-                        <button class="btn btn-secondary" disabled>Siguiente &raquo;</button>
-                    }
-                </div>
+    <partial name="_Paginacion" />
 </div>

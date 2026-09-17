@@ -1,0 +1,46 @@
+@model PerfilFormulario
+@{ ViewData["Title"] = "Mi perfil"; }
+<h1>Mi perfil</h1>
+<div class="row">
+    <div class="col-lg-7">
+        <form asp-action="Perfil" method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" autocomplete="given-name" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Apellido" class="form-label"></label>
+                <input asp-for="Apellido" class="form-control" autocomplete="family-name" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            @if (Model.TieneAvatar)
+            {
+                <div class="mb-3">
+                    <img src="@Url.Action("Avatar")" alt="Tu avatar actual" width="112" height="112" class="rounded-circle mb-2" style="object-fit:cover" />
+                    <div class="form-check">
+                        <input asp-for="QuitarAvatar" class="form-check-input" />
+                        <label asp-for="QuitarAvatar" class="form-check-label">Quitar avatar actual</label>
+                    </div>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="ArchivoAvatar" class="form-label">Nuevo avatar</label>
+                <input asp-for="ArchivoAvatar" type="file" accept="image/png,image/jpeg,image/webp" class="form-control" aria-describedby="ayudaAvatar" />
+                <div id="ayudaAvatar" class="form-text">PNG, JPEG o WebP. Hasta 2 MB. Si elegís una imagen, reemplazará la anterior.</div>
+                <span asp-validation-for="ArchivoAvatar" class="text-danger"></span>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-action="Password" class="btn btn-outline-secondary">Cambiar contraseña</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

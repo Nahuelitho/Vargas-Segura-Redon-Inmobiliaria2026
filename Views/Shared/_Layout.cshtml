@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,6 +19,8 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
@@ -34,13 +36,35 @@
                         <li class="nav-item"><a class="nav-link text-dark" asp-controller="Inmueble" asp-action="Index">Inmuebles</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-controller="TipoInmueble" asp-action="Index">Tipos de inmueble</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-controller="Reserva" asp-action="Index">Reservas</a></li>
+                            @if (User.IsInRole(Roles.Administrador))
+                            {
+                                <li class="nav-item"><a class="nav-link text-dark" asp-controller="Usuario" asp-action="Index">Usuarios</a></li>
+                            }
+                        }
                     </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="d-flex gap-2 align-items-center">
+                            <a class="nav-link text-dark" asp-controller="Cuenta" asp-action="Perfil">Mi perfil · @User.Identity.Name</a>
+                            <form asp-controller="Cuenta" asp-action="Salir" method="post">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Cerrar sesión</button>
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["Mensaje"] is string mensaje)
+            {
+                <div class="alert alert-success" role="status">@mensaje</div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="alert alert-danger" role="alert">@error</div>
+            }
             @RenderBody()
         </main>
     </div>

@@ -1,0 +1,7 @@
+@model UsuarioFormulario
+@{ ViewData["Title"] = "Nuevo usuario"; }
+<h1>Nuevo usuario</h1>
+<div class="row"><div class="col-md-7">
+    <form asp-action="Crear" method="post" class="card card-body shadow-sm"><partial name="_Formulario" model="Model" /></form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

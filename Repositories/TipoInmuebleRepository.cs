@@ -8,12 +8,29 @@ public class TipoInmuebleRepository(IConfiguration config)
     private readonly string _cadenaConexion = config.GetConnectionString("DefaultConnection")!;
     private MySqlConnection CrearConexion() => new(_cadenaConexion);
 
-    public async Task<List<TipoInmueble>> ObtenerTodos()
+    public async Task<int> ObtenerCantidad()
+    {
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        const string sql = "SELECT COUNT(*) FROM tipos_inmueble WHERE estado = true";
+        await using var comando = new MySqlCommand(sql, conexion);
+        return Convert.ToInt32(await comando.ExecuteScalarAsync());
+    }
+
+    public async Task<List<TipoInmueble>> ObtenerTodos(int paginaActual = 1, int? limite = null)
     {
         var tipos = new List<TipoInmueble>();
         await using var conexion = CrearConexion(); await conexion.OpenAsync();
-        const string sql = "SELECT id, descripcion, estado FROM tipos_inmueble WHERE estado = true ORDER BY descripcion";
-        await using var comando = new MySqlCommand(sql, conexion); await using var lector = await comando.ExecuteReaderAsync();
+        var sql = "SELECT id, descripcion, estado FROM tipos_inmueble WHERE estado = true ORDER BY descripcion, id";
+        // Sin limite se conserva el listado completo para los selectores de los formularios.
+        if (limite.HasValue) sql += " LIMIT @limit OFFSET @offset";
+        await using var comando = new MySqlCommand(sql, conexion);
+        if (limite.HasValue)
+        {
+            comando.Parameters.AddWithValue("@limit", limite.Value);
+            comando.Parameters.AddWithValue("@offset", (long)(paginaActual - 1) * limite.Value);
+        }
+        await using var lector = await comando.ExecuteReaderAsync();
         while (await lector.ReadAsync()) tipos.Add(new TipoInmueble { Id = lector.GetInt32("id"), Descripcion = lector.GetString("descripcion"), Estado = lector.GetBoolean("estado") });
         return tipos;
     }

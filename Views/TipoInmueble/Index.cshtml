@@ -22,9 +22,12 @@
                 <td class="text-end"><a asp-action="Detalles" asp-route-id="@tipo.Id"
                                             class="btn btn-sm btn-outline-secondary">Detalles</a> <a asp-action="Editar"
                                                                              asp-route-id="@tipo.Id" class="btn btn-sm btn-outline-primary">Editar</a>
-                    <form asp-action="Eliminar" asp-route-id="@tipo.Id" method="post" class="d-inline"><button
+                    @if (User.IsInRole(Roles.Administrador))
+                    {
+<form asp-action="Eliminar" asp-route-id="@tipo.Id" method="post" class="d-inline"><button
                         class="btn btn-sm btn-outline-danger"
                         onclick="return confirm('¿Eliminar este tipo?')">Eliminar</button></form>
+                    }
                     </td>
                 </tr>
             }
@@ -37,3 +40,4 @@
         </tbody>
     </table>
 </div>
+<partial name="_Paginacion" />

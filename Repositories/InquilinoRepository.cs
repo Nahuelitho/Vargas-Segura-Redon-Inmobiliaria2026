@@ -13,6 +13,24 @@ public class InquilinoRepository(IConfiguration config)
       return new MySqlConnection(_cadenaConexion);
     }
 
+    public async Task<int> ObtenerCantidad()
+{
+    await using var conexion = CrearConexion();
+    await conexion.OpenAsync();
+
+    const string consultaSql = """
+        SELECT COUNT(*)
+        FROM Inquilinos
+        WHERE Estado = true;
+        """;
+
+    await using var comando = new MySqlCommand(consultaSql, conexion);
+
+    var resultado = await comando.ExecuteScalarAsync();
+
+    return Convert.ToInt32(resultado);
+}
+
     public async Task<List<Inquilino>> ObtenerTodos(int pagina = 1, int limite = 10)
     {
         var inquilinos = new List<Inquilino>();
@@ -21,7 +39,7 @@ public class InquilinoRepository(IConfiguration config)
         await conexion.OpenAsync();
 
         const string consultaSql = """ 
-        SELECT * FROM inquilinos WHERE estado = true
+        SELECT * FROM inquilinos WHERE estado = true ORDER BY apellido, nombre, id
         LIMIT @limit OFFSET @offset;
         """;
 

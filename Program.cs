@@ -1,4 +1,5 @@
 using Inmobiliaria.Repositories;
+using Inmobiliaria.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Logging.AddDebug();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AgregarSeguridad(builder.Environment.IsDevelopment());
 
 builder.Services.AddScoped<PropietarioRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
@@ -17,6 +19,18 @@ builder.Services.AddScoped<TipoInmuebleRepository>();
 builder.Services.AddScoped<ReservaRepository>();
 
 var app = builder.Build();
+
+if (args.Contains("--crear-admin"))
+{
+    try { await AdministradorInicial.Ejecutar(app.Services); }
+    catch (InvalidOperationException ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode = 1; }
+    catch (MySqlConnector.MySqlException)
+    {
+        Console.Error.WriteLine("No se pudo preparar el administrador. Compruebe que MySQL esté iniciado, la base exista y la conexión tenga permisos para crear la tabla usuarios.");
+        Environment.ExitCode = 1;
+    }
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -31,7 +45,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllerRoute(
     name: "default",

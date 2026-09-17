@@ -1,0 +1,7 @@
+@model UsuarioFormulario
+@{ ViewData["Title"] = "Editar usuario"; }
+<h1>Editar usuario</h1>
+<div class="row"><div class="col-md-7">
+    <form asp-action="Editar" asp-route-id="@Model.Id" method="post" class="card card-body shadow-sm"><partial name="_Formulario" model="Model" /></form>
+</div></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

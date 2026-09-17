@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Inmobiliaria.Models;
 using Inmobiliaria.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,21 @@ public class PropietarioController(PropietarioRepository repositorio, ILogger<Pr
     private readonly PropietarioRepository _repositorio = repositorio;
     private readonly ILogger<PropietarioController> _registrador = registrador;
 
-    public async Task<IActionResult> Index(int pagina = 1, int limite = 10)
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
     {
-        var propietarios = await _repositorio.ObtenerTodos(pagina, limite);
+        limite = limite > 0 ? limite : 6;
+        var cantidadTotal = await _repositorio.ObtenerCantidad();
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling((double)cantidadTotal / limite));
+        pagina = Math.Clamp(pagina, 1, totalPaginas);
+        var registros = await _repositorio.ObtenerTodos(pagina, limite);
 
         ViewData["PaginaActual"] = pagina;
-        ViewData["TieneSiguiente"] = propietarios.Count() == limite;
+        ViewData["Limite"] = limite;
+        ViewData["CantidadTotal"] = cantidadTotal;
+        ViewData["TieneSiguiente"] = pagina < totalPaginas;
         ViewData["TieneAnterior"] = pagina > 1;
-
-        return View(propietarios);
+        ViewData["TienePaginacion"] = cantidadTotal > limite;
+        return View(registros);
     }
 
     [HttpGet]
@@ -80,6 +87,7 @@ public class PropietarioController(PropietarioRepository repositorio, ILogger<Pr
     }
 
     [HttpPost]
+    [Authorize(Roles = Roles.Administrador)]
     public async Task<IActionResult> Eliminar(int id)
     {
         try

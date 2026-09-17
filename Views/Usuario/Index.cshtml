@@ -1,0 +1,37 @@
+@model UsuariosListado
+@{ ViewData["Title"] = "Usuarios"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h1>Usuarios</h1><a asp-action="Crear" class="btn btn-primary">Nuevo usuario</a></div>
+<form asp-action="Index" method="get" class="d-flex gap-2 mb-3">
+    <label for="buscar" class="visually-hidden">Buscar por nombre o email</label>
+    <input id="buscar" name="buscar" value="@Model.Buscar" maxlength="100" type="search" class="form-control" placeholder="Buscar por nombre o email" />
+    <button class="btn btn-outline-primary">Buscar</button>
+</form>
+<div class="table-responsive">
+    <table class="table align-middle"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>
+        @foreach (var usuario in Model.Usuarios)
+        {
+            <tr>
+                <td>@usuario.Nombre @usuario.Apellido</td><td>@usuario.Email</td><td>@usuario.Rol</td>
+                <td>
+                    @if (usuario.Id.ToString() == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                    {
+                        <a asp-controller="Cuenta" asp-action="Perfil" class="btn btn-sm btn-outline-primary">Mi perfil</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Editar" asp-route-id="@usuario.Id" class="btn btn-sm btn-outline-primary">Editar</a>
+                        <form asp-action="Eliminar" asp-route-id="@usuario.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Dar de baja este usuario? Ya no podrá ingresar.');">Dar de baja</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        @if (Model.Usuarios.Count == 0) { <tr><td colspan="4">No se encontraron usuarios.</td></tr> }
+    </tbody></table>
+</div>
+<nav aria-label="Páginas de usuarios" class="d-flex gap-3 align-items-center">
+    @if (Model.Pagina > 1) { <a asp-action="Index" asp-route-pagina="@(Model.Pagina - 1)" asp-route-buscar="@Model.Buscar">Anterior</a> }
+    <span>Página @Model.Pagina de @Model.TotalPaginas</span>
+    @if (Model.Pagina < Model.TotalPaginas) { <a asp-action="Index" asp-route-pagina="@(Model.Pagina + 1)" asp-route-buscar="@Model.Buscar">Siguiente</a> }
+</nav>

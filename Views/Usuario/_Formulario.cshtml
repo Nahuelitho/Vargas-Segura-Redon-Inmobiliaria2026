@@ -1,0 +1,38 @@
+@model UsuarioFormulario
+<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+<input asp-for="Id" type="hidden" />
+<div class="mb-3">
+    <label asp-for="Nombre" class="form-label"></label>
+    <input asp-for="Nombre" class="form-control" />
+    <span asp-validation-for="Nombre" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Apellido" class="form-label"></label>
+    <input asp-for="Apellido" class="form-control" />
+    <span asp-validation-for="Apellido" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Email" class="form-label"></label>
+    <input asp-for="Email" class="form-control" autocomplete="off" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Rol" class="form-label"></label>
+    <select asp-for="Rol" class="form-select">
+        <option value="Empleado">Empleado</option>
+        <option value="Administrador">Administrador</option>
+    </select>
+    <span asp-validation-for="Rol" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Password" class="form-label"></label>
+    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+    <div class="form-text">Entre 10 y 128 caracteres. @(Model.Id > 0 ? "Dejá ambos campos vacíos para mantener la contraseña actual." : "Obligatoria para crear el usuario.")</div>
+    <span asp-validation-for="Password" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Confirmacion" class="form-label"></label>
+    <input asp-for="Confirmacion" class="form-control" autocomplete="new-password" />
+    <span asp-validation-for="Confirmacion" class="text-danger"></span>
+</div>
+<div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

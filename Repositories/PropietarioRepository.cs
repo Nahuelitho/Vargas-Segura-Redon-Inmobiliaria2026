@@ -14,7 +14,26 @@ public class PropietarioRepository(IConfiguration config)
   }
 
   // LISTAR
-  public async Task<List<Propietario>> ObtenerTodos(int paginaActual = 1, int limite = 10)
+  public async Task<int> ObtenerCantidad()
+{
+    await using var conexion = CrearConexion();
+    await conexion.OpenAsync();
+
+    const string consultaSql = """
+        SELECT COUNT(*)
+        FROM Propietarios
+        WHERE Estado = true
+        ;
+        """;
+
+    await using var comando = new MySqlCommand(consultaSql, conexion);
+
+    var resultado = await comando.ExecuteScalarAsync();
+
+    return Convert.ToInt32(resultado);
+}
+
+    public async Task<List<Propietario>> ObtenerTodos(int paginaActual = 1, int limite = 10)
   {
         var propietarios = new List<Propietario>();
 
@@ -25,6 +44,7 @@ public class PropietarioRepository(IConfiguration config)
         SELECT Id, Dni, Nombre, Apellido, Telefono, Email, Direccion, Estado
         FROM Propietarios
         WHERE Estado = true
+        ORDER BY Apellido, Nombre, Id
         LIMIT @limit OFFSET @offset
         """;
 
