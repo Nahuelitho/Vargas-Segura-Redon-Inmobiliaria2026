@@ -11,6 +11,7 @@ public class PropietarioController(PropietarioRepository repositorio, ILogger<Pr
     private readonly ILogger<PropietarioController> _registrador = registrador;
 
     public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
+    public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
     {
         limite = limite > 0 ? limite : 6;
         var cantidadTotal = await _repositorio.ObtenerCantidad();

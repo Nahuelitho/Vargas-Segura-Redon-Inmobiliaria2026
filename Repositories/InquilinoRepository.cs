@@ -65,6 +65,24 @@ public class InquilinoRepository(IConfiguration config)
 
         return inquilinos;
     }
+    // CONTAR INQUILINOS
+public async Task<int> ObtenerCantidad()
+{
+    await using var conexion = CrearConexion();
+    await conexion.OpenAsync();
+
+    const string consultaSql = """
+        SELECT COUNT(*)
+        FROM Inquilinos
+        WHERE Estado = true;
+        """;
+
+    await using var comando = new MySqlCommand(consultaSql, conexion);
+
+    var resultado = await comando.ExecuteScalarAsync();
+
+    return Convert.ToInt32(resultado);
+}
 
     public async Task<Inquilino?> ObtenerPorId(int id)
     {

@@ -70,6 +70,24 @@ public class PropietarioRepository(IConfiguration config)
 
         return propietarios;
     }
+    // CONTAR PROPIETARIOS
+public async Task<int> ObtenerCantidad()
+{
+    await using var conexion = CrearConexion();
+    await conexion.OpenAsync();
+
+    const string consultaSql = """
+        SELECT COUNT(*)
+        FROM Propietarios
+        WHERE Estado = true;
+        """;
+
+    await using var comando = new MySqlCommand(consultaSql, conexion);
+
+    var resultado = await comando.ExecuteScalarAsync();
+
+    return Convert.ToInt32(resultado);
+}
 
     // Obtener un propietario por id
     public async Task<Propietario?> ObtenerPorId(int id)
