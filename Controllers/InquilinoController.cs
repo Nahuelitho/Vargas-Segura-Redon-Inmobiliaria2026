@@ -12,12 +12,6 @@ public class InquilinoController(
     private readonly InquilinoRepository _repositorio = repositorio;
     private readonly ILogger<InquilinoController> _registrador = registrador;
 
-    [HttpGet]
-    public async Task<IActionResult> Buscar(string? termino)
-    {
-        var resultados = await _repositorio.Buscar(termino);
-        return Json(new { resultados = resultados.Take(20), hayMas = resultados.Count > 20 });
-    }
     public async Task<IActionResult> Index(int pagina = 1, int limite = 6)
     {
         var inquilinos = await _repositorio.ObtenerTodos(pagina, limite);

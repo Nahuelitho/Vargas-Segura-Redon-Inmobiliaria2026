@@ -26,7 +26,7 @@
                 <td>@r.Inmueble?.Direccion</td>
                 <td>@r.FechaInicio.ToShortDateString()</td>
                 <td>@r.FechaFin.ToShortDateString()</td>
-                <td>@r.MontoPorDia.ToString("C")</td>
+                <td>@r.MontoPorDia?.ToString("C")</td>
                 <td class="text-end"><a asp-action="Detalles" asp-route-id="@r.Id"
                                             class="btn btn-sm btn-outline-secondary">Detalles</a> <a asp-action="Editar"
                                                                              asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary">Editar</a>
@@ -45,4 +45,3 @@
         </tbody>
     </table>
 </div>
-<partial name="_Paginacion" />
