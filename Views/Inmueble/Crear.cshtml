@@ -12,6 +12,12 @@
             
             <div class="row g-3">
                 <div class="col-md-6">
+                    <label for="BuscarPropietario" class="form-label">Buscar por DNI o nombre</label>
+                    <input id="BuscarPropietario" type="search" class="form-control mb-2"
+                           placeholder="Buscar por DNI o nombre" maxlength="100" autocomplete="off"
+                           data-busqueda-url="@Url.Action("Buscar", "Propietario")"
+                           data-busqueda-select="IdPropietario" aria-describedby="EstadoPropietario" />
+                    <p id="EstadoPropietario" class="form-text" role="status" aria-live="polite">Escribí al menos 2 caracteres.</p>
                     <label asp-for="IdPropietario" class="form-label">Propietario</label>
                     <select asp-for="IdPropietario" asp-items="ViewBag.Propietarios" class="form-select">
                         <option value="">Seleccione...</option>

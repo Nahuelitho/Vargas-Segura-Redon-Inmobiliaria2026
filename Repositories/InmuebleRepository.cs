@@ -8,16 +8,50 @@ public class InmuebleRepository(IConfiguration config)
     private readonly string _cadenaConexion = config.GetConnectionString("DefaultConnection")!;
     private MySqlConnection CrearConexion() => new(_cadenaConexion);
 
-    public async Task<List<Inmueble>> ObtenerTodos()
+    public async Task<List<OpcionBusqueda>> Buscar(string? termino)
+    {
+        termino = termino?.Trim();
+        if (string.IsNullOrEmpty(termino) || termino.Length < 2 || termino.Length > 100)
+            return new List<OpcionBusqueda>();
+
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        const string sql = "SELECT id, direccion AS texto FROM inmuebles WHERE estado = true AND direccion LIKE @termino ESCAPE '!' ORDER BY direccion, id LIMIT 21";
+        await using var comando = new MySqlCommand(sql, conexion);
+        var filtro = termino.Replace("!", "!!").Replace("%", "!%").Replace("_", "!_");
+        comando.Parameters.AddWithValue("@termino", $"%{filtro}%");
+        await using var lector = await comando.ExecuteReaderAsync();
+        var resultados = new List<OpcionBusqueda>();
+        while (await lector.ReadAsync())
+            resultados.Add(new OpcionBusqueda(lector.GetInt32("id"), lector.GetString("texto")));
+        return resultados;
+    }
+    public async Task<List<Inmueble>> ObtenerTodos(int paginaActual = 1, int? limite = null)
     {
         var inmuebles = new List<Inmueble>();
         await using var conexion = CrearConexion(); await conexion.OpenAsync();
-        const string sql = "SELECT i.*, p.nombre propietario_nombre, p.apellido propietario_apellido, t.descripcion tipo_descripcion FROM inmuebles i JOIN propietarios p ON p.id = i.id_propietario JOIN tipos_inmueble t ON t.id = i.id_tipo WHERE i.estado = true ORDER BY i.direccion";
-        await using var comando = new MySqlCommand(sql, conexion); await using var lector = await comando.ExecuteReaderAsync();
+        var sql = "SELECT i.*, p.nombre propietario_nombre, p.apellido propietario_apellido, t.descripcion tipo_descripcion FROM inmuebles i JOIN propietarios p ON p.id = i.id_propietario JOIN tipos_inmueble t ON t.id = i.id_tipo WHERE i.estado = true ORDER BY i.direccion, i.id";
+        // Sin limite se conserva el listado completo para los selectores de los formularios.
+        if (limite.HasValue) sql += " LIMIT @limit OFFSET @offset";
+        await using var comando = new MySqlCommand(sql, conexion);
+        if (limite.HasValue)
+        {
+            comando.Parameters.AddWithValue("@limit", limite.Value);
+            comando.Parameters.AddWithValue("@offset", (long)(paginaActual - 1) * limite.Value);
+        }
+        await using var lector = await comando.ExecuteReaderAsync();
         while (await lector.ReadAsync()) inmuebles.Add(Mapear(lector));
         return inmuebles;
     }
 
+    public async Task<int> ObtenerCantidad()
+    {
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        const string sql = "SELECT COUNT(*) FROM inmuebles i JOIN propietarios p ON p.id = i.id_propietario JOIN tipos_inmueble t ON t.id = i.id_tipo WHERE i.estado = true";
+        await using var comando = new MySqlCommand(sql, conexion);
+        return Convert.ToInt32(await comando.ExecuteScalarAsync());
+    }
     public async Task<Inmueble?> ObtenerPorId(int id)
     {
         await using var conexion = CrearConexion(); await conexion.OpenAsync();

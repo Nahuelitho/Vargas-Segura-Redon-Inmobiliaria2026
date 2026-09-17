@@ -70,6 +70,24 @@ public async Task<int> ObtenerCantidad()
 }
 
     // Obtener un propietario por id
+    public async Task<List<OpcionBusqueda>> Buscar(string? termino)
+    {
+        termino = termino?.Trim();
+        if (string.IsNullOrEmpty(termino) || termino.Length < 2 || termino.Length > 100)
+            return new List<OpcionBusqueda>();
+
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        const string sql = "SELECT id, CONCAT(apellido, ', ', nombre, ' - DNI ', dni) AS texto FROM propietarios WHERE estado = true AND (dni LIKE @termino ESCAPE '!' OR CONCAT(nombre, ' ', apellido) LIKE @termino ESCAPE '!' OR CONCAT(apellido, ' ', nombre) LIKE @termino ESCAPE '!') ORDER BY apellido, nombre, id LIMIT 21";
+        await using var comando = new MySqlCommand(sql, conexion);
+        var filtro = termino.Replace("!", "!!").Replace("%", "!%").Replace("_", "!_");
+        comando.Parameters.AddWithValue("@termino", $"%{filtro}%");
+        await using var lector = await comando.ExecuteReaderAsync();
+        var resultados = new List<OpcionBusqueda>();
+        while (await lector.ReadAsync())
+            resultados.Add(new OpcionBusqueda(lector.GetInt32("id"), lector.GetString("texto")));
+        return resultados;
+    }
     public async Task<Propietario?> ObtenerPorId(int id)
     {
       await using var conexion = CrearConexion();

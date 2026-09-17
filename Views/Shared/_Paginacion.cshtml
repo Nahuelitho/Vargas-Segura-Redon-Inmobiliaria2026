@@ -1,0 +1,34 @@
+@if (ViewData["TienePaginacion"] is true)
+{
+    <nav class="d-flex justify-content-between align-items-center mt-4" aria-label="Paginación">
+        @if (ViewData["TieneAnterior"] is true)
+        {
+            <a asp-action="Index"
+               asp-route-pagina="@((int)ViewData["PaginaActual"]! - 1)"
+               asp-route-limite="@ViewData["Limite"]"
+               class="btn btn-primary">
+                &laquo; Anterior
+            </a>
+        }
+        else
+        {
+            <button type="button" class="btn btn-secondary" disabled>&laquo; Anterior</button>
+        }
+
+        <span>Página @ViewData["PaginaActual"]</span>
+
+        @if (ViewData["TieneSiguiente"] is true)
+        {
+            <a asp-action="Index"
+               asp-route-pagina="@((int)ViewData["PaginaActual"]! + 1)"
+               asp-route-limite="@ViewData["Limite"]"
+               class="btn btn-primary">
+                Siguiente &raquo;
+            </a>
+        }
+        else
+        {
+            <button type="button" class="btn btn-secondary" disabled>Siguiente &raquo;</button>
+        }
+    </nav>
+}
