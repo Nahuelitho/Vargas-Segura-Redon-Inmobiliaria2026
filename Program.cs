@@ -8,7 +8,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AgregarSeguridad(builder.Environment.IsDevelopment());
 
@@ -17,8 +16,17 @@ builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<InmuebleRepository>();
 builder.Services.AddScoped<TipoInmuebleRepository>();
 builder.Services.AddScoped<ReservaRepository>();
+builder.Services.AddScoped<PagoRepository>();
 
 var app = builder.Build();
+
+if (args.Contains("--migrar-pagos"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<PagoRepository>().InicializarTabla();
+    Console.WriteLine("Módulo de pagos preparado. Los registros existentes se conservaron.");
+    return;
+}
 
 if (args.Contains("--crear-admin"))
 {
@@ -32,11 +40,9 @@ if (args.Contains("--crear-admin"))
     return;
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

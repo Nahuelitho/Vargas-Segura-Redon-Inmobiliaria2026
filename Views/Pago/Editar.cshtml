@@ -1,0 +1,11 @@
+@model PagoConceptoFormulario
+@{ ViewData["Title"] = "Editar concepto del pago"; }
+<h1>Editar concepto del pago</h1>
+<p>La fecha y el importe se conservan tal como se registraron.</p>
+<form asp-action="Editar" asp-route-id="@ViewBag.IdPago" asp-route-idReserva="@ViewBag.IdReserva" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Concepto" class="form-label"></label><input asp-for="Concepto" class="form-control" maxlength="255" /><span asp-validation-for="Concepto" class="text-danger"></span></div>
+    <button type="submit" class="btn btn-primary">Guardar concepto</button>
+    <a asp-action="Index" asp-route-idReserva="@ViewBag.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

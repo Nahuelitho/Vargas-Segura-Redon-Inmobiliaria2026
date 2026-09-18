@@ -20,3 +20,105 @@ html {
 body {
   margin-bottom: 60px;
 }
+.inicio {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+.inicio-presentacion {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 2rem;
+    padding: 0 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.inicio-texto h1 {
+    font-size: clamp(1.8rem, 2.5vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -.025em;
+    margin-bottom: .75rem;
+}
+
+.inicio-texto p {
+    max-width: 29rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.inicio-ilustracion {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 420px;
+    height: clamp(180px, 34vh, 300px);
+    justify-self: center;
+    object-fit: contain;
+}
+
+.inicio .card {
+    border-color: #e1e5e9;
+    border-radius: .25rem;
+}
+
+.inicio .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.inicio-titulo-tarjeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: .6rem;
+}
+
+.inicio-titulo-tarjeta h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.inicio-titulo-tarjeta svg {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    color: #7b838c;
+}
+
+.inicio .card p {
+    font-size: .95rem;
+    line-height: 1.6;
+}
+
+.inicio .card .btn {
+    align-self: flex-start;
+    margin-top: auto;
+    border-color: #aebdce;
+    color: #37658e;
+    font-size: .875rem;
+}
+
+.inicio .card .btn:hover,
+.inicio .card .btn:focus-visible {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+@media (max-width: 767px) {
+    .inicio-presentacion {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem 0 0;
+    }
+
+    .inicio-ilustracion {
+        height: 200px;
+    }
+}

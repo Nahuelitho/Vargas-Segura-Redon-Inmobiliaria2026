@@ -3,6 +3,7 @@
     ViewData["Title"] = "Detalle de la reserva";
 }
 <h1>Detalle de la reserva</h1>
+<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.Id" class="btn btn-outline-primary">Ver pagos</a></p>
 <div class="card shadow-sm">
     <div class="card-body">
         <dl class="row mb-0">
@@ -13,11 +14,11 @@
             <dt class="col-sm-4">Inmueble</dt>
             <dd class="col-sm-8">@Model.Inmueble?.Direccion</dd>
             <dt class="col-sm-4">Período</dt>
-            <dd class="col-sm-8">@Model.FechaInicio.ToShortDateString() al @Model.FechaFin.ToShortDateString()</dd>
+            <dd class="col-sm-8">@Model.FechaInicio.ToString("dd/MM/yyyy") al @Model.FechaFin.ToString("dd/MM/yyyy")</dd>
             <dt class="col-sm-4">Monto por día</dt>
             <dd class="col-sm-8">@Model.MontoPorDia?.ToString("C")</dd>
             <dt class="col-sm-4">Fecha de terminación</dt>
-            <dd class="col-sm-8">@(Model.FechaTerminacion?.ToShortDateString() ?? "Sin finalizar")</dd>
+            <dd class="col-sm-8">@(Model.FechaTerminacion?.ToString("dd/MM/yyyy") ?? "Sin finalizar")</dd>
             <dt class="col-sm-4">Multa</dt>
             <dd class="col-sm-8">@(Model.Multa?.ToString("C") ?? "No aplica")</dd>
             <dt class="col-sm-4">Reserva de origen</dt>

@@ -26,11 +26,47 @@ public class ReservaController(ReservaRepository repositorio, InquilinoRepositor
     }
     public async Task<IActionResult> Crear() { await CargarListas(); return View(new Reserva()); }
     [HttpPost] public async Task<IActionResult> Crear(Reserva reserva) => await Guardar(reserva, false);
-    public async Task<IActionResult> Editar(int id) { var reserva=await repositorio.ObtenerPorId(id); if(reserva is null)return NotFound(); await CargarListas(); return View(reserva); }
+    public async Task<IActionResult> Editar(int id) { var reserva=await repositorio.ObtenerPorId(id); if(reserva is null)return NotFound(); await CargarListas(id); return View(reserva); }
     [HttpPost] public async Task<IActionResult> Editar(Reserva reserva) => await Guardar(reserva, true);
     public async Task<IActionResult> Detalles(int id) => await repositorio.ObtenerPorId(id) is { } reserva ? View(reserva) : NotFound();
     [HttpPost] [Authorize(Roles = Roles.Administrador)]
     public async Task<IActionResult> Eliminar(int id) => await repositorio.Eliminar(id) ? RedirectToAction(nameof(Index)) : NotFound();
-    private async Task<IActionResult> Guardar(Reserva reserva, bool editar) { if (reserva.FechaFin < reserva.FechaInicio) ModelState.AddModelError(nameof(reserva.FechaFin), "La fecha de fin no puede ser anterior a la fecha de inicio."); if(!ModelState.IsValid){await CargarListas();return View(reserva);} if(editar ? await repositorio.Actualizar(reserva) : await repositorio.Crear(reserva)>0)return RedirectToAction(nameof(Index));return NotFound(); }
-    private async Task CargarListas() { ViewBag.Inquilinos = new SelectList(await inquilinos.ObtenerTodos(1,1000), "Id", "Dni"); ViewBag.Inmuebles = new SelectList(await inmuebles.ObtenerTodos(), "Id", "Direccion"); }
+    private async Task<IActionResult> Guardar(Reserva reserva, bool editar)
+    {
+        if (reserva.FechaFin < reserva.FechaInicio)
+            ModelState.AddModelError(nameof(reserva.FechaFin), "La fecha de fin no puede ser anterior a la fecha de inicio.");
+
+        if (reserva.IdReservaOrigen.HasValue)
+        {
+            if (editar && reserva.IdReservaOrigen == reserva.Id)
+                ModelState.AddModelError(nameof(reserva.IdReservaOrigen), "Una reserva no puede ser su propio origen.");
+            else if (!await repositorio.Existe(reserva.IdReservaOrigen.Value))
+                ModelState.AddModelError(nameof(reserva.IdReservaOrigen), "La reserva de origen no existe. Seleccione una de la lista o elija Sin reserva de origen.");
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                if (editar ? await repositorio.Actualizar(reserva) : await repositorio.Crear(reserva) > 0)
+                    return RedirectToAction(nameof(Index));
+                return NotFound();
+            }
+            catch (MySqlConnector.MySqlException ex) when (ex.Number == 1452)
+            {
+                ModelState.AddModelError(string.Empty, "No se pudo guardar porque uno de los registros seleccionados ya no existe. Revise el inquilino, el inmueble y la reserva de origen.");
+            }
+        }
+        await CargarListas(editar ? reserva.Id : 0);
+        return View(reserva);
+    }
+
+    private async Task CargarListas(int idActual = 0)
+    {
+        ViewBag.Inquilinos = (await inquilinos.ObtenerTodos(1,1000))
+            .Select(i => new SelectListItem { Value = i.Id.ToString(), Text = $"{i.Nombre} {i.Apellido}" })
+            .ToList();
+        ViewBag.Inmuebles = new SelectList(await inmuebles.ObtenerTodos(), "Id", "Direccion");
+        ViewBag.ReservasOrigen = await repositorio.ObtenerOpcionesOrigen(idActual);
+    }
 }

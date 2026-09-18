@@ -7,6 +7,58 @@ public class ReservaRepository(IConfiguration config)
 {
     private readonly string _cadenaConexion = config.GetConnectionString("DefaultConnection")!;
     private MySqlConnection CrearConexion() => new(_cadenaConexion);
+
+    public async Task<bool> Existe(int id)
+    {
+        await using var c = CrearConexion();
+        await c.OpenAsync();
+        await using var cmd = new MySqlCommand("SELECT EXISTS(SELECT 1 FROM reservas WHERE id=@id)", c);
+        cmd.Parameters.AddWithValue("@id", id);
+        return Convert.ToBoolean(await cmd.ExecuteScalarAsync());
+    }
+
+    public async Task<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> ObtenerOpcionesOrigen(int idActual)
+    {
+        await using var c = CrearConexion();
+        await c.OpenAsync();
+        // Incluye las bajas para conservar referencias históricas al editar.
+        await using var cmd = new MySqlCommand("SELECT r.id,r.fecha_inicio,r.estado,m.direccion FROM reservas r JOIN inmuebles m ON m.id=r.id_inmueble WHERE r.id<>@actual ORDER BY r.id DESC", c);
+        cmd.Parameters.AddWithValue("@actual", idActual);
+        await using var lector = await cmd.ExecuteReaderAsync();
+        var opciones = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+        while (await lector.ReadAsync())
+            opciones.Add(new() { Value = lector.GetInt32("id").ToString(), Text = $"#{lector.GetInt32("id")} · {lector.GetString("direccion")} · {lector.GetDateTime("fecha_inicio"):dd/MM/yyyy}{(lector.GetBoolean("estado") ? "" : " (dada de baja)")}" });
+        return opciones;
+    }
+
+    // Guarda reserva y seña en una transacción, usando el porcentaje del inmueble.
+    public async Task<int> CrearConSena(Reserva reserva, decimal importeSena, DateTime fechaPago, int idUsuario)
+    {
+        System.ComponentModel.DataAnnotations.Validator.ValidateObject(reserva, new System.ComponentModel.DataAnnotations.ValidationContext(reserva), true);
+        await using var c = CrearConexion();
+        await c.OpenAsync();
+        await using var tx = await c.BeginTransactionAsync();
+        await using var inmueble = new MySqlCommand("SELECT porcentaje_reserva FROM inmuebles WHERE id=@id AND estado=true FOR UPDATE", c, tx);
+        inmueble.Parameters.AddWithValue("@id", reserva.IdInmueble);
+        var porcentaje = await inmueble.ExecuteScalarAsync();
+        if (porcentaje is null or DBNull) throw new ArgumentException("El inmueble no existe o no tiene porcentaje de reserva.");
+        var sena = Inmobiliaria.Services.SenaService.Preparar(reserva, Convert.ToDecimal(porcentaje), importeSena, fechaPago, idUsuario);
+        await using var crear = new MySqlCommand("INSERT INTO reservas (id_inquilino,id_inmueble,fecha_inicio,fecha_fin,monto_por_dia,fecha_terminacion,multa,id_reserva_origen,estado) VALUES (@inquilino,@inmueble,@inicio,@fin,@monto,@terminacion,@multa,@origen,true); SELECT LAST_INSERT_ID();", c, tx);
+        Cargar(crear, reserva);
+        var id = Convert.ToInt32(await crear.ExecuteScalarAsync());
+        if (sena is not null)
+        {
+            await using var pago = new MySqlCommand("INSERT INTO pagos (id_reserva,concepto,fecha_pago,importe,estado,es_sena,id_usuario_creador) VALUES (@reserva,@concepto,@fecha,@importe,true,true,@usuario)", c, tx);
+            pago.Parameters.AddWithValue("@reserva", id);
+            pago.Parameters.AddWithValue("@concepto", sena.Concepto);
+            pago.Parameters.AddWithValue("@fecha", sena.FechaPago);
+            pago.Parameters.AddWithValue("@importe", sena.Importe);
+            pago.Parameters.AddWithValue("@usuario", idUsuario);
+            await pago.ExecuteNonQueryAsync();
+        }
+        await tx.CommitAsync();
+        return id;
+    }
     public async Task<int> ObtenerCantidad()
     {
         await using var conexion = CrearConexion();

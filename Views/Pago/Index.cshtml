@@ -1,0 +1,44 @@
+@model PagosReservaVista
+@{ ViewData["Title"] = "Pagos de la reserva"; var administrador = User.IsInRole(Roles.Administrador); }
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div><h1>Pagos de la reserva #@Model.Reserva.Id</h1>
+        <p>@Model.Reserva.Inquilino?.Nombre @Model.Reserva.Inquilino?.Apellido · @Model.Reserva.Inmueble?.Direccion</p>
+        <p>@Model.Reserva.FechaInicio.ToString("dd/MM/yyyy") al @Model.Reserva.FechaFin.ToString("dd/MM/yyyy")</p>
+    </div>
+    <a asp-action="Crear" asp-route-idReserva="@Model.Reserva.Id" class="btn btn-primary">Agregar pago</a>
+</div>
+<p><strong>Total pagado vigente:</strong> @Model.TotalPagado.ToString("C")</p>
+<p><strong>Seña calculada:</strong> @(Model.SenaEsperada?.ToString("C") ?? "No disponible: revise los datos de la reserva y del inmueble.")</p>
+<p class="text-muted">La seña se calcula con el porcentaje actual del inmueble y las noches de la reserva, con un mínimo de un día. Los pagos anulados no se suman al total.</p>
+<div class="table-responsive">
+<table class="table table-hover">
+    <thead class="table-dark"><tr><th>Concepto</th><th>Fecha</th><th>Importe</th><th>Estado</th>
+        @if (administrador) { <th>Creado por</th><th>Anulado por</th> }
+        <th>Acciones</th></tr></thead>
+    <tbody>
+    @foreach (var pago in Model.Pagos)
+    {
+        <tr class="@(pago.Estado ? "" : "table-secondary")">
+            <td>@pago.Concepto @if(pago.EsSena) { <span class="badge bg-info text-dark">Seña inicial</span> }</td>
+            <td>@pago.FechaPago.ToString("dd/MM/yyyy")</td><td>@pago.Importe.ToString("C")</td>
+            <td><span class="badge @(pago.Estado ? "bg-success" : "bg-secondary")">@(pago.Estado ? "Vigente" : "Anulado")</span></td>
+            @if (administrador)
+            {
+                <td>@(pago.UsuarioCreador ?? "Sin registro histórico")</td>
+                <td>@(pago.Estado ? "—" : pago.UsuarioAnulador ?? "Sin registro histórico")</td>
+            }
+            <td>@if (pago.Estado) {
+                <a asp-action="Editar" asp-route-id="@pago.Id" asp-route-idReserva="@Model.Reserva.Id" class="btn btn-sm btn-outline-primary">Editar concepto</a>
+                @if (administrador) {
+                    <form asp-action="Anular" asp-route-id="@pago.Id" asp-route-idReserva="@Model.Reserva.Id" method="post" class="d-inline">
+                        <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Anular este pago? Se conservará en el historial.');">Anular</button>
+                    </form>
+                }
+            }</td>
+        </tr>
+    }
+    @if (Model.Pagos.Count == 0) { <tr><td colspan="@(administrador ? 7 : 5)" class="text-center">No hay pagos registrados.</td></tr> }
+    </tbody>
+</table>
+</div>
+<a asp-controller="Reserva" asp-action="Detalles" asp-route-id="@Model.Reserva.Id" class="btn btn-secondary">Volver a la reserva</a>

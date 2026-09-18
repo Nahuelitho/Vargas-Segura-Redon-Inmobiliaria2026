@@ -24,10 +24,10 @@
             <tr>
                 <td>@r.Inquilino?.Nombre @r.Inquilino?.Apellido</td>
                 <td>@r.Inmueble?.Direccion</td>
-                <td>@r.FechaInicio.ToShortDateString()</td>
-                <td>@r.FechaFin.ToShortDateString()</td>
+                <td>@r.FechaInicio.ToString("dd/MM/yyyy")</td>
+                <td>@r.FechaFin.ToString("dd/MM/yyyy")</td>
                 <td>@r.MontoPorDia?.ToString("C")</td>
-                <td class="text-end"><a asp-action="Detalles" asp-route-id="@r.Id"
+                <td class="text-end"><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@r.Id" class="btn btn-sm btn-outline-success">Pagos</a> <a asp-action="Detalles" asp-route-id="@r.Id"
                                             class="btn btn-sm btn-outline-secondary">Detalles</a> <a asp-action="Editar"
                                                                              asp-route-id="@r.Id" class="btn btn-sm btn-outline-primary">Editar</a>
                     @if (User.IsInRole(Roles.Administrador))

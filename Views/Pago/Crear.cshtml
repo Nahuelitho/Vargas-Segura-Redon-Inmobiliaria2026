@@ -1,0 +1,15 @@
+@model PagoFormulario
+@{ ViewData["Title"] = "Agregar pago"; }
+<h1>Agregar pago a la reserva #@ViewBag.IdReserva</h1>
+<form asp-action="Crear" asp-route-idReserva="@ViewBag.IdReserva" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Concepto" class="form-label"></label><input asp-for="Concepto" class="form-control" maxlength="255" /><span asp-validation-for="Concepto" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="FechaPago" class="form-label"></label><input asp-for="FechaPago" type="text" asp-format="{0:dd/MM/yyyy}" placeholder="dd/mm/aaaa" maxlength="10" data-fecha-reserva class="form-control" /><span asp-validation-for="FechaPago" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Importe" class="form-label"></label><input asp-for="Importe" class="form-control" type="number" step="0.01" min="0.01" max="99999999.99" /><span asp-validation-for="Importe" class="text-danger"></span></div>
+    <button type="submit" class="btn btn-primary">Registrar pago</button>
+    <a asp-action="Index" asp-route-idReserva="@ViewBag.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/fechas-reserva.js" asp-append-version="true"></script>
+}
