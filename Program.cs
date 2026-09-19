@@ -14,9 +14,11 @@ builder.Services.AgregarSeguridad(builder.Environment.IsDevelopment());
 builder.Services.AddScoped<PropietarioRepository>();
 builder.Services.AddScoped<InquilinoRepository>();
 builder.Services.AddScoped<InmuebleRepository>();
+builder.Services.AddScoped<ImagenInmuebleRepository>();
 builder.Services.AddScoped<TipoInmuebleRepository>();
 builder.Services.AddScoped<ReservaRepository>();
 builder.Services.AddScoped<PagoRepository>();
+builder.Services.AddScoped<ImagenInmuebleService>();
 
 var app = builder.Build();
 

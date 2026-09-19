@@ -1,0 +1,85 @@
+@model GaleriaInmuebleVista
+@{
+    ViewData["Title"] = "Galeria del inmueble";
+    string RutaImg(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "" :
+        nombre.StartsWith("http") ? nombre : "/images/inmuebles/" + nombre;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Galeria</h1>
+        <p class="text-muted mb-0">@Model.Inmueble.Direccion</p>
+    </div>
+    <a asp-action="Detalles" asp-route-id="@Model.Inmueble.Id" class="btn btn-secondary">Volver al inmueble</a>
+</div>
+
+<form asp-action="AgregarImagen" method="post" enctype="multipart/form-data" class="card card-body mb-4">
+    <input asp-for="NuevaImagen.IdInmueble" type="hidden" />
+    <div class="row g-2 align-items-end">
+        <div class="col-md-7">
+            <label asp-for="NuevaImagen.Archivo" class="form-label">Seleccionar imagen (PNG, JPG o WebP, max 5 MB)</label>
+            <input asp-for="NuevaImagen.Archivo" type="file" class="form-control" accept="image/png,image/jpeg,image/webp" id="input-nueva-imagen" />
+            <span asp-validation-for="NuevaImagen.Archivo" class="text-danger"></span>
+        </div>
+        <div class="col-md-2">
+            <img id="preview-nueva" src="" alt="Preview" class="img-thumbnail d-none" style="max-height:80px" />
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100">Agregar imagen</button>
+        </div>
+    </div>
+</form>
+
+<div class="row g-3">
+    @if (!string.IsNullOrWhiteSpace(Model.Inmueble.ImagenPortada))
+    {
+        <div class="col-md-4">
+            <div class="card h-100">
+                <img src="@RutaImg(Model.Inmueble.ImagenPortada)" class="card-img-top" alt="Portada de @Model.Inmueble.Direccion" style="object-fit:cover;height:200px" />
+                <div class="card-body">
+                    <span class="badge bg-primary">Portada</span>
+                </div>
+            </div>
+        </div>
+    }
+    @foreach (var imagen in Model.Imagenes)
+    {
+        <div class="col-md-4">
+            <div class="card h-100">
+                <img src="@RutaImg(imagen.Url)" class="card-img-top" alt="Imagen de @Model.Inmueble.Direccion" style="object-fit:cover;height:200px" />
+                <div class="card-body text-end">
+                    @if (User.IsInRole(Roles.Administrador))
+                    {
+                        <form asp-action="EliminarImagen" asp-route-id="@imagen.Id" asp-route-idInmueble="@Model.Inmueble.Id" method="post">
+                            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Quitar esta imagen de la galeria?')">Quitar</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @if (Model.Imagenes.Count == 0 && string.IsNullOrWhiteSpace(Model.Inmueble.ImagenPortada))
+    {
+        <p class="text-muted">Aun no hay imagenes cargadas.</p>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const inputNueva = document.getElementById('input-nueva-imagen');
+        const previewNueva = document.getElementById('preview-nueva');
+        if (inputNueva) {
+            inputNueva.addEventListener('change', () => {
+                const file = inputNueva.files[0];
+                if (file) {
+                    previewNueva.src = URL.createObjectURL(file);
+                    previewNueva.classList.remove('d-none');
+                } else {
+                    previewNueva.classList.add('d-none');
+                }
+            });
+        }
+    </script>
+}

@@ -159,6 +159,8 @@ CREATE TABLE `reservas` (
   `fecha_terminacion` date DEFAULT NULL,
   `multa` decimal(10,2) DEFAULT NULL,
   `id_reserva_origen` int(11) DEFAULT NULL,
+  `id_usuario_creador` int(11) DEFAULT NULL,
+  `id_usuario_terminador` int(11) DEFAULT NULL,
   `estado` tinyint(1) NOT NULL DEFAULT 1
 ) ;
 
@@ -166,8 +168,8 @@ CREATE TABLE `reservas` (
 -- Volcado de datos para la tabla `reservas`
 --
 
-INSERT INTO `reservas` (`id`, `id_inquilino`, `id_inmueble`, `fecha_inicio`, `fecha_fin`, `monto_por_dia`, `fecha_terminacion`, `multa`, `id_reserva_origen`, `estado`) VALUES
-(2, 1, 2, '2026-09-18', '2026-09-21', 90000.00, '2026-09-20', 90000.00, NULL, 1);
+INSERT INTO `reservas` (`id`, `id_inquilino`, `id_inmueble`, `fecha_inicio`, `fecha_fin`, `monto_por_dia`, `fecha_terminacion`, `multa`, `id_reserva_origen`, `id_usuario_creador`, `id_usuario_terminador`, `estado`) VALUES
+(2, 1, 2, '2026-09-18', '2026-09-21', 90000.00, '2026-09-20', 90000.00, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -272,7 +274,9 @@ ALTER TABLE `reservas`
   ADD KEY `ix_reservas_inquilino` (`id_inquilino`),
   ADD KEY `ix_reservas_inmueble` (`id_inmueble`),
   ADD KEY `ix_reservas_fechas` (`fecha_inicio`,`fecha_fin`),
-  ADD KEY `ix_reservas_origen` (`id_reserva_origen`);
+  ADD KEY `ix_reservas_origen` (`id_reserva_origen`),
+  ADD KEY `ix_reserva_usuario_creador` (`id_usuario_creador`),
+  ADD KEY `ix_reserva_usuario_terminador` (`id_usuario_terminador`);
 
 --
 -- Indices de la tabla `tipos_inmueble`
@@ -371,7 +375,9 @@ ALTER TABLE `pagos`
 ALTER TABLE `reservas`
   ADD CONSTRAINT `fk_reservas_inmuebles` FOREIGN KEY (`id_inmueble`) REFERENCES `inmuebles` (`id`),
   ADD CONSTRAINT `fk_reservas_inquilinos` FOREIGN KEY (`id_inquilino`) REFERENCES `inquilinos` (`id`),
-  ADD CONSTRAINT `fk_reservas_origen` FOREIGN KEY (`id_reserva_origen`) REFERENCES `reservas` (`id`);
+  ADD CONSTRAINT `fk_reservas_origen` FOREIGN KEY (`id_reserva_origen`) REFERENCES `reservas` (`id`),
+  ADD CONSTRAINT `fk_reserva_usuario_creador` FOREIGN KEY (`id_usuario_creador`) REFERENCES `usuarios` (`id`),
+  ADD CONSTRAINT `fk_reserva_usuario_terminador` FOREIGN KEY (`id_usuario_terminador`) REFERENCES `usuarios` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

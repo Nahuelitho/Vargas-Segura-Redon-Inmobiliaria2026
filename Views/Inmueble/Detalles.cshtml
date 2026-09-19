@@ -1,6 +1,9 @@
 @model Inmueble
 @{
     ViewData["Title"] = "Detalle del inmueble";
+    string RutaImg(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "" :
+        nombre.StartsWith("http") ? nombre : "/images/inmuebles/" + nombre;
 }
 <h1>Detalle del inmueble</h1>
 <div class="card shadow-sm">
@@ -23,10 +26,11 @@
             <dt class="col-sm-4">Disponible</dt>
             <dd class="col-sm-8">@(Model.Disponible ? "Sí" : "No")</dd>
         </dl>@if(!string.IsNullOrWhiteSpace(Model.ImagenPortada)){
-        <img src="@Model.ImagenPortada" alt="@Model.Direccion"
+        <img src="@RutaImg(Model.ImagenPortada)" alt="@Model.Direccion"
              class="img-fluid rounded mt-3" style="max-height:300px" />
     }
 </div>
-<div class="card-footer text-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Editar"
+<div class="card-footer d-flex gap-2 justify-content-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Galeria" asp-route-id="@Model.Id" class="btn btn-outline-primary">Galería</a>
+    <form asp-action="CambiarDisponibilidad" asp-route-id="@Model.Id" asp-route-disponible="@(!Model.Disponible)" method="post"><button class="btn btn-outline-warning">@(Model.Disponible ? "Suspender oferta" : "Reactivar oferta")</button></form><a asp-action="Editar"
                                                                                                    asp-route-id="@Model.Id" class="btn btn-primary">Editar</a></div>
 </div>

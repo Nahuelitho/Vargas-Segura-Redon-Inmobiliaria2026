@@ -21,3 +21,5 @@ wwwroot/img/uploads/
 TestResults/
 coverage/
 App_Data/
+obj/
+narrativa.pdf

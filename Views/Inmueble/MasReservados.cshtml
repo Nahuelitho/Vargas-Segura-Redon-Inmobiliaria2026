@@ -1,0 +1,3 @@
+@model List<InmuebleReservado>
+@{ ViewData["Title"]="Inmuebles más reservados"; }
+<h1>Inmuebles más reservados</h1><p class="text-muted">Reservas iniciadas durante los últimos 365 días.</p><div class="table-responsive"><table class="table table-hover"><thead><tr><th>Dirección</th><th>Propietario</th><th>Tipo</th><th>Reservas</th></tr></thead><tbody>@foreach(var i in Model){<tr><td><a asp-action="Detalles" asp-route-id="@i.Id">@i.Direccion</a></td><td>@i.Propietario?.Apellido, @i.Propietario?.Nombre</td><td>@i.Tipo?.Descripcion</td><td>@i.CantidadReservas</td></tr>}@if(!Model.Any()){<tr><td colspan="4" class="text-center">No hay reservas en los últimos 365 días.</td></tr>}</tbody></table></div><a asp-action="InformeGeneral" class="btn btn-secondary">Volver a informes</a>

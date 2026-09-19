@@ -36,6 +36,11 @@ public class Inmueble
     [Range(0, 100, ErrorMessage ="Ingrese un porcentaje entre 0 y 100")]
     public decimal? PorcentajeReserva { get; set; }
     public string? ImagenPortada { get; set; }
+
+    // Archivo subido por el usuario para la imagen de portada.
+    // No se persiste en BD; su contenido se guarda en disco y el nombre en ImagenPortada.
+    public IFormFile? ArchivoPortada { get; set; }
+
     public bool Disponible { get; set; } = true;
     public bool Estado { get; set; } = true;
 }

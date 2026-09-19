@@ -1,0 +1,109 @@
+@model BusquedaInmueblesFiltro
+@{
+    ViewData["Title"] = "Buscar inmuebles";
+    var resultado = ViewBag.Resultado as ListadoInmueblesVista;
+    string RutaImg(string? nombre) =>
+        string.IsNullOrWhiteSpace(nombre) ? "" :
+        nombre.StartsWith("http") ? nombre : "/images/inmuebles/" + nombre;
+}
+<h1>Buscar inmuebles disponibles</h1>
+<p class="text-muted">Solo se muestran inmuebles activos, con oferta vigente y sin reservas superpuestas.</p>
+
+<form asp-action="Buscar" method="post" class="card card-body mb-4">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="FechaInicio" class="form-label"></label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="FechaFin" class="form-label"></label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+            <span asp-validation-for="FechaFin" class="text-danger"></span>
+        </div>
+        <div class="col-md-2">
+            <label asp-for="IdTipo" class="form-label">Tipo</label>
+            <input asp-for="IdTipo" type="hidden" />
+            <input id="buscar-tipo" class="form-control" autocomplete="off" placeholder="Buscar tipo" />
+            <div id="opciones-tipo" class="list-group position-absolute shadow" style="z-index:10"></div>
+        </div>
+        <div class="col-md-2">
+            <label asp-for="CupoMinimo" class="form-label">Cupo minimo</label>
+            <input asp-for="CupoMinimo" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label asp-for="PrecioMaximo" class="form-label">Precio/dia maximo</label>
+            <input asp-for="PrecioMaximo" class="form-control" />
+        </div>
+    </div>
+    <button class="btn btn-primary mt-3 align-self-end">Buscar</button>
+</form>
+
+@if (resultado is not null)
+{
+    <h2 class="h4">@resultado.Total resultado(s)</h2>
+    <div class="row g-3">
+        @foreach (var inmueble in resultado.Inmuebles)
+        {
+            <div class="col-md-4">
+                <div class="card h-100">
+                    @if (!string.IsNullOrWhiteSpace(inmueble.ImagenPortada))
+                    {
+                        <img src="@RutaImg(inmueble.ImagenPortada)" class="card-img-top" alt="@inmueble.Direccion" style="object-fit:cover;height:180px" />
+                    }
+                    <div class="card-body">
+                        <h3 class="h5">@inmueble.Direccion</h3>
+                        <p class="mb-1">@inmueble.Tipo?.Descripcion &middot; Cupo @inmueble.Cupo</p>
+                        <strong>@inmueble.PrecioPorDia?.ToString("C") por dia</strong>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="Detalles" asp-route-id="@inmueble.Id" class="btn btn-outline-primary btn-sm">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    @if (resultado.TotalPaginas > 1)
+    {
+        <div class="mt-3">
+            @for (var p = 1; p <= resultado.TotalPaginas; p++)
+            {
+                <form asp-action="Buscar" method="post" class="d-inline">
+                    <input type="hidden" asp-for="FechaInicio" />
+                    <input type="hidden" asp-for="FechaFin" />
+                    <input type="hidden" asp-for="IdTipo" />
+                    <input type="hidden" asp-for="CupoMinimo" />
+                    <input type="hidden" asp-for="PrecioMaximo" />
+                    <button name="pagina" value="@p" class="btn btn-sm @(p == resultado.Pagina ? "btn-primary" : "btn-outline-primary")">@p</button>
+                </form>
+            }
+        </div>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const input = document.getElementById('buscar-tipo'),
+                hidden = document.getElementById('IdTipo'),
+                lista = document.getElementById('opciones-tipo');
+            let espera;
+            async function buscar() {
+                const r = await fetch('@Url.Action("Opciones")?entidad=tipos&termino=' + encodeURIComponent(input.value));
+                const datos = await r.json();
+                lista.replaceChildren(...datos.map(x => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'list-group-item list-group-item-action';
+                    b.textContent = x.texto;
+                    b.onclick = () => { hidden.value = x.id; input.value = x.texto; lista.replaceChildren(); };
+                    return b;
+                }));
+            }
+            input.addEventListener('input', () => { hidden.value = ''; clearTimeout(espera); espera = setTimeout(buscar, 250); });
+            input.addEventListener('focus', buscar);
+        })();
+    </script>
+}

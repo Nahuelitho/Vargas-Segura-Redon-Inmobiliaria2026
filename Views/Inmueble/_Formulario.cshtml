@@ -1,62 +1,118 @@
 @model Inmueble
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="IdPropietario" class="form-label">Propietario</label>
-                    <select asp-for="IdPropietario" asp-items="ViewBag.Propietarios" class="form-select">
-                        <option value="">Seleccione...</option>
-                    </select>
-                    <span asp-validation-for="IdPropietario" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-6">
-                    <label asp-for="IdTipo" class="form-label">Tipo de inmueble</label>
-                    <select asp-for="IdTipo" asp-items="ViewBag.Tipos" class="form-select">
-                        <option value="">Seleccione...</option>
-                    </select>
-                    <span asp-validation-for="IdTipo" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-8">
-                    <label asp-for="Direccion" class="form-label">Dirección</label>
-                    <input asp-for="Direccion" class="form-control" />
-                    <span asp-validation-for="Direccion" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="Cupo" class="form-label">Cupo</label>
-                    <input asp-for="Cupo" class="form-control" />
-                    <span asp-validation-for="Cupo" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="PrecioPorDia" class="form-label">Precio por día</label>
-                    <input asp-for="PrecioPorDia" class="form-control" data-val-number="Ingrese un numero valido" />
-                    <span asp-validation-for="PrecioPorDia" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="PorcentajeReserva" class="form-label">Porcentaje de reserva</label>
-                    <input asp-for="PorcentajeReserva" class="form-control" data-val-number="Ingrese un numero valido" />
-                    <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="Coordenadas" class="form-label">Coordenadas</label>
-                    <input asp-for="Coordenadas" class="form-control" />
-                    <span asp-validation-for="Coordenadas" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-8">
-                    <label asp-for="ImagenPortada" class="form-label">URL de imagen de portada</label>
-                    <input asp-for="ImagenPortada" class="form-control" />
-                </div>
-                
-                <div class="col-md-4 d-flex align-items-end">
-                    <div class="form-check">
-                        <input asp-for="Disponible" class="form-check-input" />
-                        <label asp-for="Disponible" class="form-check-label">Disponible</label>
-                    </div>
-                </div>
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="IdPropietario" class="form-label">Propietario</label>
+        <input asp-for="IdPropietario" type="hidden" />
+        <input id="buscar-propietario" class="form-control" autocomplete="off" placeholder="Escriba para buscar propietario" value="@(Model.Propietario is null ? "" : $"{Model.Propietario.Apellido}, {Model.Propietario.Nombre}")" />
+        <div id="opciones-propietario" class="list-group position-absolute w-auto shadow" style="z-index:10"></div>
+        <span asp-validation-for="IdPropietario" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-6">
+        <label asp-for="IdTipo" class="form-label">Tipo de inmueble</label>
+        <input asp-for="IdTipo" type="hidden" />
+        <input id="buscar-tipo" class="form-control" autocomplete="off" placeholder="Escriba para buscar tipo" value="@Model.Tipo?.Descripcion" />
+        <div id="opciones-tipo" class="list-group position-absolute w-auto shadow" style="z-index:10"></div>
+        <span asp-validation-for="IdTipo" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-8">
+        <label asp-for="Direccion" class="form-label">Direccion</label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-4">
+        <label asp-for="Cupo" class="form-label">Cupo</label>
+        <input asp-for="Cupo" class="form-control" />
+        <span asp-validation-for="Cupo" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-4">
+        <label asp-for="PrecioPorDia" class="form-label">Precio por dia</label>
+        <input asp-for="PrecioPorDia" class="form-control" data-val-number="Ingrese un numero valido" />
+        <span asp-validation-for="PrecioPorDia" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-4">
+        <label asp-for="PorcentajeReserva" class="form-label">Porcentaje de reserva</label>
+        <input asp-for="PorcentajeReserva" class="form-control" data-val-number="Ingrese un numero valido" />
+        <span asp-validation-for="PorcentajeReserva" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-4">
+        <label asp-for="Coordenadas" class="form-label">Coordenadas</label>
+        <input asp-for="Coordenadas" class="form-control" />
+        <span asp-validation-for="Coordenadas" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-8">
+        <label asp-for="ArchivoPortada" class="form-label">Imagen de portada (PNG, JPG o WebP, max 5 MB)</label>
+        <input asp-for="ArchivoPortada" type="file" class="form-control" accept="image/png,image/jpeg,image/webp" id="input-portada" />
+        <span asp-validation-for="ArchivoPortada" class="text-danger"></span>
+        @if (!string.IsNullOrWhiteSpace(Model.ImagenPortada))
+        {
+            <div class="mt-2">
+                <small class="text-muted">Imagen actual:</small><br />
+                <img id="preview-portada"
+                     src="@(Model.ImagenPortada.StartsWith("http") ? Model.ImagenPortada : "/images/inmuebles/" + Model.ImagenPortada)"
+                     alt="Portada actual" class="img-thumbnail mt-1" style="max-height:140px" />
             </div>
+        }
+        else
+        {
+            <img id="preview-portada" src="" alt="" class="img-thumbnail mt-2 d-none" style="max-height:140px" />
+        }
+    </div>
+    
+    <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check">
+            <input asp-for="Disponible" class="form-check-input" />
+            <label asp-for="Disponible" class="form-check-label">Disponible</label>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+    // Preview imagen portada
+    const inputPortada = document.getElementById('input-portada');
+    const preview = document.getElementById('preview-portada');
+    if (inputPortada && preview) {
+        inputPortada.addEventListener('change', () => {
+            const file = inputPortada.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('d-none');
+            }
+        });
+    }
+
+    // Desplegables con busqueda en servidor
+    function enlazar(campo, oculto, contenedor, entidad) {
+        const input = document.getElementById(campo), hidden = document.getElementById(oculto), lista = document.getElementById(contenedor);
+        let espera;
+        const buscar = async () => {
+            const respuesta = await fetch('@Url.Action("Opciones", "Inmueble")?entidad=' + entidad + '&termino=' + encodeURIComponent(input.value));
+            const datos = await respuesta.json();
+            lista.replaceChildren(...datos.map(x => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'list-group-item list-group-item-action';
+                b.textContent = x.texto;
+                b.onclick = () => { hidden.value = x.id; input.value = x.texto; lista.replaceChildren(); };
+                return b;
+            }));
+        };
+        input.addEventListener('input', () => { hidden.value = ''; clearTimeout(espera); espera = setTimeout(buscar, 250); });
+        input.addEventListener('focus', buscar);
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#' + campo) && !e.target.closest('#' + contenedor)) lista.replaceChildren();
+        });
+    }
+    enlazar('buscar-propietario', 'IdPropietario', 'opciones-propietario', 'propietarios');
+    enlazar('buscar-tipo', 'IdTipo', 'opciones-tipo', 'tipos');
+})();
+</script>

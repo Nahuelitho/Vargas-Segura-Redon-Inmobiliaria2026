@@ -364,14 +364,14 @@ public class ReservaRepository(IConfiguration config)
 
         if (incluirAuditoria)
         {
-            sql += """
+            sql += "\n" + """
                 ,
                 CONCAT(uc.nombre, ' ', uc.apellido) AS usuario_creador,
                 CONCAT(ut.nombre, ' ', ut.apellido) AS usuario_terminador
                 """;
         }
 
-        sql += """
+        sql += "\n" + """
             FROM reservas r
             JOIN inquilinos i ON i.id = r.id_inquilino
             JOIN inmuebles m ON m.id = r.id_inmueble
@@ -379,7 +379,7 @@ public class ReservaRepository(IConfiguration config)
 
         if (incluirAuditoria)
         {
-            sql += """
+            sql += "\n" + """
                 LEFT JOIN usuarios uc
                     ON uc.id = r.id_usuario_creador
                 LEFT JOIN usuarios ut
@@ -387,7 +387,7 @@ public class ReservaRepository(IConfiguration config)
                 """;
         }
 
-        sql += """
+        sql += "\n" + """
             WHERE r.id = @id
               AND r.estado = true
             """;
