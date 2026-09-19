@@ -1,30 +1,205 @@
 @model Reserva
+
 @{
     ViewData["Title"] = "Detalle de la reserva";
 }
+
 <h1>Detalle de la reserva</h1>
-<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.Id" class="btn btn-outline-primary">Ver pagos</a></p>
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+
+    <a asp-controller="Pago"
+       asp-action="Index"
+       asp-route-idReserva="@Model.Id"
+       class="btn btn-outline-primary">
+        Ver pagos
+    </a>
+
+    <a asp-action="Renovar"
+       asp-route-id="@Model.Id"
+       class="btn btn-outline-success">
+        Renovar
+    </a>
+
+    @if (!Model.FechaTerminacion.HasValue)
+    {
+        <a asp-action="Terminar"
+           asp-route-id="@Model.Id"
+           class="btn btn-outline-danger">
+
+            Terminar anticipadamente
+
+        </a>
+    }
+
+</div>
+
 <div class="card shadow-sm">
+
     <div class="card-body">
+
         <dl class="row mb-0">
-            <dt class="col-sm-4">Identificador</dt>
-            <dd class="col-sm-8">@Model.Id</dd>
-            <dt class="col-sm-4">Inquilino</dt>
-            <dd class="col-sm-8">@Model.Inquilino?.Nombre @Model.Inquilino?.Apellido</dd>
-            <dt class="col-sm-4">Inmueble</dt>
-            <dd class="col-sm-8">@Model.Inmueble?.Direccion</dd>
-            <dt class="col-sm-4">Período</dt>
-            <dd class="col-sm-8">@Model.FechaInicio.ToString("dd/MM/yyyy") al @Model.FechaFin.ToString("dd/MM/yyyy")</dd>
-            <dt class="col-sm-4">Monto por día</dt>
-            <dd class="col-sm-8">@Model.MontoPorDia?.ToString("C")</dd>
-            <dt class="col-sm-4">Fecha de terminación</dt>
-            <dd class="col-sm-8">@(Model.FechaTerminacion?.ToString("dd/MM/yyyy") ?? "Sin finalizar")</dd>
-            <dt class="col-sm-4">Multa</dt>
-            <dd class="col-sm-8">@(Model.Multa?.ToString("C") ?? "No aplica")</dd>
-            <dt class="col-sm-4">Reserva de origen</dt>
-            <dd class="col-sm-8">@(Model.IdReservaOrigen?.ToString() ?? "No aplica")</dd>
+
+            <dt class="col-sm-4">
+                Identificador
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Id
+            </dd>
+
+            <dt class="col-sm-4">
+                Inquilino
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Inquilino?.Nombre
+                @Model.Inquilino?.Apellido
+            </dd>
+
+            <dt class="col-sm-4">
+                Inmueble
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.Inmueble?.Direccion
+            </dd>
+
+            <dt class="col-sm-4">
+                Período original
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @Model.FechaInicio.ToString("dd/MM/yyyy")
+                al
+                @Model.FechaFin.ToString("dd/MM/yyyy")
+
+            </dd>
+
+            <dt class="col-sm-4">
+                Monto por día
+            </dt>
+
+            <dd class="col-sm-8">
+                @Model.MontoPorDia?.ToString("C")
+            </dd>
+
+            <dt class="col-sm-4">
+                Estado
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @if (Model.FechaTerminacion.HasValue)
+                {
+                    <span class="badge bg-secondary">
+                        Finalizada anticipadamente
+                    </span>
+                }
+                else if (Model.FechaFin.Date < DateTime.Today)
+                {
+                    <span class="badge bg-secondary">
+                        Finalizada
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-success">
+                        Vigente
+                    </span>
+                }
+
+            </dd>
+
+            <dt class="col-sm-4">
+                Fecha de terminación efectiva
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @(Model.FechaTerminacion?.ToString("dd/MM/yyyy")
+                    ?? "Sin terminación anticipada")
+
+            </dd>
+
+            <dt class="col-sm-4">
+                Multa
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @(Model.Multa?.ToString("C")
+                    ?? "No aplica")
+
+            </dd>
+
+            <dt class="col-sm-4">
+                Reserva de origen
+            </dt>
+
+            <dd class="col-sm-8">
+
+                @if (Model.IdReservaOrigen.HasValue)
+                {
+                    <a asp-action="Detalles"
+                       asp-route-id="@Model.IdReservaOrigen">
+
+                        Reserva #@Model.IdReservaOrigen
+
+                    </a>
+                }
+                else
+                {
+                    <span>No aplica</span>
+                }
+
+            </dd>
+
+            @if (User.IsInRole(Roles.Administrador))
+            {
+                <dt class="col-sm-4">
+                    Creada por
+                </dt>
+
+                <dd class="col-sm-8">
+
+                    @(Model.UsuarioCreador
+                        ?? "Sin información")
+
+                </dd>
+
+                <dt class="col-sm-4">
+                    Terminada por
+                </dt>
+
+                <dd class="col-sm-8">
+
+                    @(Model.UsuarioTerminador
+                        ?? (Model.FechaTerminacion.HasValue
+                            ? "Sin información"
+                            : "No aplica"))
+
+                </dd>
+            }
+
         </dl>
+
     </div>
-    <div class="card-footer text-end"><a asp-action="Index" class="btn btn-secondary">Volver</a><a asp-action="Editar"
-                                                                                                       asp-route-id="@Model.Id" class="btn btn-primary">Editar</a></div>
+
+    <div class="card-footer d-flex justify-content-between">
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Volver
+        </a>
+
+        <a asp-action="Editar"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary">
+            Editar
+        </a>
+
     </div>
+
+</div>

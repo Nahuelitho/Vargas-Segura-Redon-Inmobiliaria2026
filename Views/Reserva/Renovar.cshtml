@@ -1,0 +1,119 @@
+@model Reserva
+
+@{
+    ViewData["Title"] = "Renovar reserva";
+}
+
+<h1>Renovar reserva</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <form asp-action="Renovar"
+              method="post">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger">
+            </div>
+
+            <input asp-for="IdReservaOrigen"
+                   type="hidden" />
+
+            <input asp-for="IdInquilino"
+                   type="hidden" />
+
+            <input asp-for="IdInmueble"
+                   type="hidden" />
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label asp-for="FechaInicio"
+                           class="form-label">
+                        Fecha de inicio
+                    </label>
+
+                    <input asp-for="FechaInicio"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="FechaInicio"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label asp-for="FechaFin"
+                           class="form-label">
+                        Fecha de fin
+                    </label>
+
+                    <input asp-for="FechaFin"
+                           type="date"
+                           class="form-control" />
+
+                    <span asp-validation-for="FechaFin"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Seña
+                    </label>
+
+                    <input type="number"
+                           name="importeSena"
+                           step="0.01"
+                           min="0"
+                           class="form-control"
+                           required />
+
+                    @Html.ValidationMessage(
+                        "importeSena",
+                        null,
+                        new { @class = "text-danger" })
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Fecha de pago
+                    </label>
+
+                    <input type="date"
+                           name="fechaPago"
+                           value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           class="form-control"
+                           required />
+
+                </div>
+
+            </div>
+
+            <div class="mt-4">
+
+                <a asp-action="Detalles"
+                   asp-route-id="@Model.IdReservaOrigen"
+                   class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+                <button class="btn btn-primary">
+                    Crear renovación
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

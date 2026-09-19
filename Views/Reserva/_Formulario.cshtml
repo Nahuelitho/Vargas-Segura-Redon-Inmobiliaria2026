@@ -1,57 +1,113 @@
 @model Reserva
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label asp-for="IdInquilino" class="form-label">Inquilino</label>
-                    <select asp-for="IdInquilino" asp-items="ViewBag.Inquilinos" class="form-select">
-                        <option value="">Seleccione...</option>
-                    </select>
-                    <span asp-validation-for="IdInquilino" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-6">
-                    <label asp-for="IdInmueble" class="form-label">Inmueble</label>
-                    <select asp-for="IdInmueble" asp-items="ViewBag.Inmuebles" class="form-select">
-                        <option value="">Seleccione...</option>
-                    </select>
-                    <span asp-validation-for="IdInmueble" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
-                    <input asp-for="FechaInicio" type="text" asp-format="{0:dd/MM/yyyy}" placeholder="dd/mm/aaaa" maxlength="10" data-fecha-reserva class="form-control" />
-                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="FechaFin" class="form-label">Fecha de fin</label>
-                    <input asp-for="FechaFin" type="text" asp-format="{0:dd/MM/yyyy}" placeholder="dd/mm/aaaa" maxlength="10" data-fecha-reserva class="form-control" />
-                    <span asp-validation-for="FechaFin" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="MontoPorDia" class="form-label">Monto por día</label>
-                    <input asp-for="MontoPorDia" class="form-control" />
-                    <span asp-validation-for="MontoPorDia" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="FechaTerminacion" class="form-label">Fecha de terminación</label>
-                    <input asp-for="FechaTerminacion" type="text" asp-format="{0:dd/MM/yyyy}" placeholder="dd/mm/aaaa" maxlength="10" data-fecha-reserva class="form-control" />
-                    <span asp-validation-for="FechaTerminacion" class="text-danger"></span>
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="Multa" class="form-label">Multa</label>
-                    <input asp-for="Multa" class="form-control" />
-                </div>
-                
-                <div class="col-md-4">
-                    <label asp-for="IdReservaOrigen" class="form-label">Reserva de origen</label>
-                    <select asp-for="IdReservaOrigen" asp-items="ViewBag.ReservasOrigen" class="form-select">
-                        <option value="">Sin reserva de origen</option>
-                    </select>
-                    <span asp-validation-for="IdReservaOrigen" class="text-danger"></span>
-                </div>
-            </div>
+
+<div asp-validation-summary="ModelOnly"
+     class="text-danger">
+</div>
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+
+        <label asp-for="IdInquilino"
+               class="form-label">
+            Inquilino
+        </label>
+
+        <select asp-for="IdInquilino"
+                asp-items="ViewBag.Inquilinos"
+                class="form-select">
+
+            <option value="">
+                Seleccione...
+            </option>
+
+        </select>
+
+        <span asp-validation-for="IdInquilino"
+              class="text-danger">
+        </span>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <label asp-for="IdInmueble"
+               class="form-label">
+            Inmueble
+        </label>
+
+        <select asp-for="IdInmueble"
+                asp-items="ViewBag.Inmuebles"
+                class="form-select">
+
+            <option value="">
+                Seleccione...
+            </option>
+
+        </select>
+
+        <span asp-validation-for="IdInmueble"
+              class="text-danger">
+        </span>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <label asp-for="FechaInicio"
+               class="form-label">
+            Fecha de inicio
+        </label>
+
+        <input asp-for="FechaInicio"
+               type="text"
+               asp-format="{0:dd/MM/yyyy}"
+               placeholder="dd/mm/aaaa"
+               maxlength="10"
+               data-fecha-reserva
+               class="form-control" />
+
+        <span asp-validation-for="FechaInicio"
+              class="text-danger">
+        </span>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <label asp-for="FechaFin"
+               class="form-label">
+            Fecha de fin
+        </label>
+
+        <input asp-for="FechaFin"
+               type="text"
+               asp-format="{0:dd/MM/yyyy}"
+               placeholder="dd/mm/aaaa"
+               maxlength="10"
+               data-fecha-reserva
+               class="form-control" />
+
+        <span asp-validation-for="FechaFin"
+              class="text-danger">
+        </span>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <label asp-for="MontoPorDia"
+               class="form-label">
+            Monto por día
+        </label>
+
+        <input asp-for="MontoPorDia"
+               class="form-control" />
+
+        <span asp-validation-for="MontoPorDia"
+              class="text-danger">
+        </span>
+
+    </div>
+
+</div>

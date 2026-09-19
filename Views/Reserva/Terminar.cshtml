@@ -1,0 +1,77 @@
+@model Reserva
+
+@{
+    ViewData["Title"] = "Terminación anticipada";
+}
+
+<h1>Terminación anticipada</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3">
+        </div>
+
+        <p>
+            <strong>Inquilino:</strong>
+            @Model.Inquilino?.Nombre
+            @Model.Inquilino?.Apellido
+        </p>
+
+        <p>
+            <strong>Inmueble:</strong>
+            @Model.Inmueble?.Direccion
+        </p>
+
+        <p>
+            <strong>Fecha original de finalización:</strong>
+            @Model.FechaFin.ToString("dd/MM/yyyy")
+        </p>
+
+        <p>
+            <strong>Monto por día:</strong>
+            @Model.MontoPorDia?.ToString("C")
+        </p>
+
+        <div class="alert alert-warning">
+            Al confirmar se calculará automáticamente
+            la multa sobre el alquiler restante y
+            se registrará su pago.
+        </div>
+
+        <form asp-action="Terminar"
+              asp-route-id="@Model.Id"
+              method="post">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Fecha efectiva de terminación
+                </label>
+
+                <input type="date"
+                       name="fechaTerminacion"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="form-control"
+                       required />
+
+            </div>
+
+            <a asp-action="Detalles"
+               asp-route-id="@Model.Id"
+               class="btn btn-secondary">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="btn btn-danger">
+                Cobrar multa y finalizar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

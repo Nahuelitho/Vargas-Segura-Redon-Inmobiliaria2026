@@ -1,0 +1,42 @@
+@model IEnumerable<Reserva>
+
+<h1>Reservas vigentes</h1>
+
+<table class="table table-striped">
+
+    <thead>
+        <tr>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>
+                @r.Inquilino?.Nombre
+                @r.Inquilino?.Apellido
+            </td>
+
+            <td>
+                @r.Inmueble?.Direccion
+            </td>
+
+            <td>
+                @r.FechaInicio.ToString("dd/MM/yyyy")
+            </td>
+
+            <td>
+                @r.FechaFin.ToString("dd/MM/yyyy")
+            </td>
+        </tr>
+    }
+
+    </tbody>
+
+</table>
