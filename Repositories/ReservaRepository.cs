@@ -485,6 +485,7 @@ public class ReservaRepository(IConfiguration config)
                 monto_por_dia = @monto
             WHERE id = @id
               AND estado = true
+              AND fecha_terminacion IS NULL
             """;
 
         await using var cmd =

@@ -80,7 +80,7 @@ public class PagoRepository(IConfiguration config)
         if (idUsuario <= 0) throw new ArgumentException("Usuario inválido.");
         await using var c = CrearConexion();
         await c.OpenAsync();
-        await using var cmd = new MySqlCommand("UPDATE pagos SET estado=false,id_usuario_anulador=@usuario WHERE id=@id AND id_reserva=@reserva AND estado=true", c);
+        await using var cmd = new MySqlCommand("UPDATE pagos SET estado=false,id_usuario_anulador=@usuario WHERE id=@id AND id_reserva=@reserva AND estado=true AND es_sena=false", c);
         cmd.Parameters.AddWithValue("@id", id); cmd.Parameters.AddWithValue("@reserva", idReserva);
         cmd.Parameters.AddWithValue("@usuario", idUsuario);
         return await cmd.ExecuteNonQueryAsync() > 0;

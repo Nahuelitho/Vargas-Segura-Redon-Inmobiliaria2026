@@ -143,7 +143,9 @@ public class ReservaController(
             }
         }
 
-        await CargarListas();
+        await CargarListas(
+            idInquilino: reserva.IdInquilino,
+            idInmueble: reserva.IdInmueble);
 
         return View(reserva);
     }
@@ -155,6 +157,16 @@ public class ReservaController(
 
         if (reserva is null)
             return NotFound();
+
+        if (reserva.FechaTerminacion.HasValue)
+        {
+            TempData["Mensaje"] =
+                "Una reserva terminada no puede modificarse.";
+
+            return RedirectToAction(
+                nameof(Detalles),
+                new { id });
+        }
 
         await CargarListas(id);
 
@@ -248,12 +260,25 @@ public class ReservaController(
         }
         else
         {
-            // No confiamos en los IDs enviados por el navegador.
+            // No confiamos en los datos de la reserva enviados por el navegador.
             reserva.IdInquilino =
                 original.IdInquilino;
 
             reserva.IdInmueble =
                 original.IdInmueble;
+
+            reserva.MontoPorDia =
+                original.MontoPorDia;
+
+            // MontoPorDia no forma parte del formulario de renovación.
+            ModelState.Remove(nameof(Reserva.MontoPorDia));
+
+            if (reserva.FechaInicio.Date != original.FechaFin.Date)
+            {
+                ModelState.AddModelError(
+                    nameof(reserva.FechaInicio),
+                    "La renovación debe comenzar en la fecha de finalización de la reserva original.");
+            }
         }
 
         ValidarFechas(reserva);
@@ -308,7 +333,11 @@ public class ReservaController(
         }
 
         if (!ModelState.IsValid)
+        {
+            ViewData["ImporteSena"] = importeSena;
+            ViewData["FechaPago"] = fechaPago;
             return View(reserva);
+        }
 
         try
         {
@@ -329,6 +358,8 @@ public class ReservaController(
                 string.Empty,
                 ex.Message);
 
+            ViewData["ImporteSena"] = importeSena;
+            ViewData["FechaPago"] = fechaPago;
             return View(reserva);
         }
     }
@@ -343,6 +374,17 @@ public class ReservaController(
 
         if (reserva.FechaTerminacion.HasValue)
         {
+            return RedirectToAction(
+                nameof(Detalles),
+                new { id });
+        }
+
+        if (reserva.FechaInicio.Date > DateTime.Today ||
+            reserva.FechaFin.Date <= DateTime.Today)
+        {
+            TempData["Mensaje"] =
+                "Solo se puede terminar anticipadamente una reserva actualmente vigente.";
+
             return RedirectToAction(
                 nameof(Detalles),
                 new { id });
@@ -406,6 +448,21 @@ public class ReservaController(
                 dias));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Opciones(
+        string entidad,
+        string? termino)
+    {
+        return entidad switch
+        {
+            "inquilinos" =>
+                Json(await inquilinos.BuscarOpciones(termino)),
+            "inmuebles" =>
+                Json(await inmuebles.BuscarOpciones(entidad, termino)),
+            _ => BadRequest()
+        };
+    }
+
     private async Task<IActionResult> GuardarEdicion(
         Reserva reserva)
     {
@@ -432,6 +489,13 @@ public class ReservaController(
         var original =
             await repositorio.ObtenerPorId(
                 reserva.Id);
+
+        if (original?.FechaTerminacion.HasValue == true)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                "Una reserva terminada no puede modificarse.");
+        }
 
         if (inmueble is not null &&
             !inmueble.Disponible &&
@@ -481,7 +545,10 @@ public class ReservaController(
             }
         }
 
-        await CargarListas(reserva.Id);
+        await CargarListas(
+            reserva.Id,
+            reserva.IdInquilino,
+            reserva.IdInmueble);
 
         return View("Editar", reserva);
     }
@@ -497,22 +564,36 @@ public class ReservaController(
 }
 
     private async Task CargarListas(
-        int idActual = 0)
+        int idActual = 0,
+        int idInquilino = 0,
+        int idInmueble = 0)
     {
-        ViewBag.Inquilinos =
-            (await inquilinos.ObtenerTodos(1, 1000))
-            .Select(i => new SelectListItem
-            {
-                Value = i.Id.ToString(),
-                Text = $"{i.Nombre} {i.Apellido}"
-            })
-            .ToList();
+        Reserva? reserva = null;
+        if (idActual > 0)
+            reserva = await repositorio.ObtenerPorId(idActual);
 
-        ViewBag.Inmuebles =
-            new SelectList(
-                await inmuebles.ObtenerTodos(),
-                "Id",
-                "Direccion");
+        idInquilino = reserva?.IdInquilino ?? idInquilino;
+        idInmueble = reserva?.IdInmueble ?? idInmueble;
+
+        if (idInquilino > 0 || idInmueble > 0)
+        {
+            var inquilino =
+                idInquilino > 0
+                    ? await inquilinos.ObtenerPorId(idInquilino)
+                    : null;
+
+            var inmueble =
+                idInmueble > 0
+                    ? await inmuebles.ObtenerPorId(idInmueble)
+                    : null;
+
+            ViewBag.InquilinoSeleccionado = inquilino is null
+                ? string.Empty
+                : $"{inquilino.Apellido}, {inquilino.Nombre} (DNI {inquilino.Dni})";
+
+            ViewBag.InmuebleSeleccionado =
+                inmueble?.Direccion ?? string.Empty;
+        }
 
         ViewBag.ReservasOrigen =
             await repositorio.ObtenerOpcionesOrigen(

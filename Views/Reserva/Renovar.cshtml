@@ -13,7 +13,7 @@
         <form asp-action="Renovar"
               method="post">
 
-            <div asp-validation-summary="ModelOnly"
+            <div asp-validation-summary="All"
                  class="text-danger">
             </div>
 
@@ -37,6 +37,7 @@
 
                     <input asp-for="FechaInicio"
                            type="date"
+                           readonly
                            class="form-control" />
 
                     <span asp-validation-for="FechaInicio"
@@ -73,6 +74,7 @@
                            step="0.01"
                            min="0"
                            class="form-control"
+                           value="@ViewData["ImporteSena"]"
                            required />
 
                     @Html.ValidationMessage(
@@ -90,9 +92,14 @@
 
                     <input type="date"
                            name="fechaPago"
-                           value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           value="@(((DateTime?)ViewData["FechaPago"] ?? DateTime.Today).ToString("yyyy-MM-dd"))"
                            class="form-control"
                            required />
+
+                    @Html.ValidationMessage(
+                        "fechaPago",
+                        null,
+                        new { @class = "text-danger" })
 
                 </div>
 

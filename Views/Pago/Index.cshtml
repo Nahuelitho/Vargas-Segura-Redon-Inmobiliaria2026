@@ -29,7 +29,7 @@
             }
             <td>@if (pago.Estado) {
                 <a asp-action="Editar" asp-route-id="@pago.Id" asp-route-idReserva="@Model.Reserva.Id" class="btn btn-sm btn-outline-primary">Editar concepto</a>
-                @if (administrador) {
+                @if (administrador && !pago.EsSena) {
                     <form asp-action="Anular" asp-route-id="@pago.Id" asp-route-idReserva="@Model.Reserva.Id" method="post" class="d-inline">
                         <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Anular este pago? Se conservará en el historial.');">Anular</button>
                     </form>

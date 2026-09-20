@@ -13,15 +13,14 @@
             Inquilino
         </label>
 
-        <select asp-for="IdInquilino"
-                asp-items="ViewBag.Inquilinos"
-                class="form-select">
-
-            <option value="">
-                Seleccione...
-            </option>
-
-        </select>
+        <input asp-for="IdInquilino" type="hidden" />
+        <input id="buscar-inquilino"
+               type="search"
+               value="@ViewBag.InquilinoSeleccionado"
+               placeholder="Buscar por nombre, apellido o DNI"
+               autocomplete="off"
+               class="form-control" />
+        <div id="opciones-inquilino" class="list-group position-absolute z-3"></div>
 
         <span asp-validation-for="IdInquilino"
               class="text-danger">
@@ -36,15 +35,14 @@
             Inmueble
         </label>
 
-        <select asp-for="IdInmueble"
-                asp-items="ViewBag.Inmuebles"
-                class="form-select">
-
-            <option value="">
-                Seleccione...
-            </option>
-
-        </select>
+        <input asp-for="IdInmueble" type="hidden" />
+        <input id="buscar-inmueble"
+               type="search"
+               value="@ViewBag.InmuebleSeleccionado"
+               placeholder="Buscar por dirección"
+               autocomplete="off"
+               class="form-control" />
+        <div id="opciones-inmueble" class="list-group position-absolute z-3"></div>
 
         <span asp-validation-for="IdInmueble"
               class="text-danger">
@@ -111,3 +109,42 @@
     </div>
 
 </div>
+
+<script>
+    (() => {
+        function activarBusqueda(nombre, entidad) {
+            const texto = document.getElementById(`buscar-${nombre}`);
+            const id = document.getElementById(`Id${nombre[0].toUpperCase()}${nombre.slice(1)}`);
+            const opciones = document.getElementById(`opciones-${nombre}`);
+            let espera;
+
+            async function buscar() {
+                const respuesta = await fetch('@Url.Action("Opciones", "Reserva")?entidad=' + entidad + '&termino=' + encodeURIComponent(texto.value));
+                if (!respuesta.ok) return;
+                const resultados = await respuesta.json();
+                opciones.replaceChildren(...resultados.map(resultado => {
+                    const boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.className = 'list-group-item list-group-item-action';
+                    boton.textContent = resultado.texto;
+                    boton.addEventListener('click', () => {
+                        id.value = resultado.id;
+                        texto.value = resultado.texto;
+                        opciones.replaceChildren();
+                    });
+                    return boton;
+                }));
+            }
+
+            texto.addEventListener('input', () => {
+                id.value = '';
+                clearTimeout(espera);
+                espera = setTimeout(buscar, 250);
+            });
+            texto.addEventListener('focus', buscar);
+        }
+
+        activarBusqueda('inquilino', 'inquilinos');
+        activarBusqueda('inmueble', 'inmuebles');
+    })();
+</script>

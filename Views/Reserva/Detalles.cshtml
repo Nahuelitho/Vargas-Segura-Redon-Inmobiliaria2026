@@ -21,7 +21,9 @@
         Renovar
     </a>
 
-    @if (!Model.FechaTerminacion.HasValue)
+    @if (!Model.FechaTerminacion.HasValue &&
+         Model.FechaInicio.Date <= DateTime.Today &&
+         Model.FechaFin.Date > DateTime.Today)
     {
         <a asp-action="Terminar"
            asp-route-id="@Model.Id"
@@ -194,11 +196,14 @@
             Volver
         </a>
 
-        <a asp-action="Editar"
-           asp-route-id="@Model.Id"
-           class="btn btn-primary">
-            Editar
-        </a>
+        @if (!Model.FechaTerminacion.HasValue)
+        {
+            <a asp-action="Editar"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">
+                Editar
+            </a>
+        }
 
     </div>
 

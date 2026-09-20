@@ -75,7 +75,9 @@ public class InmuebleController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> AgregarImagen(ImagenInmueble imagen)
+    public async Task<IActionResult> AgregarImagen(
+        [Bind(Prefix = nameof(GaleriaInmuebleVista.NuevaImagen))]
+        ImagenInmueble imagen)
     {
         // El unico campo que valida el usuario es Archivo
         if (!ModelState.IsValid)
@@ -94,7 +96,7 @@ public class InmuebleController(
         try { nombreArchivo = await imagenesServicio.Guardar(imagen.Archivo!); }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError("Archivo", ex.Message);
+            ModelState.AddModelError("NuevaImagen.Archivo", ex.Message);
             var inmueble = await repositorio.ObtenerPorId(imagen.IdInmueble);
             if (inmueble is null) return NotFound();
             return View("Galeria", new GaleriaInmuebleVista

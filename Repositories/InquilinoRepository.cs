@@ -94,6 +94,44 @@ public class InquilinoRepository(IConfiguration config)
         return null;
     }
 
+    public async Task<List<object>> BuscarOpciones(string? termino)
+    {
+        termino = termino?.Trim();
+        if (termino?.Length > 80) termino = termino[..80];
+
+        var patron = "%" + (termino ?? "")
+            .Replace("!", "!!")
+            .Replace("%", "!%")
+            .Replace("_", "!_") + "%";
+
+        const string sql = """
+            SELECT id, CONCAT(apellido, ', ', nombre, ' (DNI ', dni, ')') texto
+            FROM inquilinos
+            WHERE estado = true
+              AND CONCAT(nombre, ' ', apellido, ' ', dni) LIKE @buscar ESCAPE '!'
+            ORDER BY apellido, nombre, id
+            LIMIT 20
+            """;
+
+        var opciones = new List<object>();
+        await using var conexion = CrearConexion();
+        await conexion.OpenAsync();
+        await using var comando = new MySqlCommand(sql, conexion);
+        comando.Parameters.AddWithValue("@buscar", patron);
+        await using var lector = await comando.ExecuteReaderAsync();
+
+        while (await lector.ReadAsync())
+        {
+            opciones.Add(new
+            {
+                id = lector.GetInt32("id"),
+                texto = lector.GetString("texto")
+            });
+        }
+
+        return opciones;
+    }
+
     public async Task<Inquilino?> Crear(Inquilino inquilino){
         await using var conexion = CrearConexion();
         await conexion.OpenAsync();

@@ -74,7 +74,7 @@ public class InmuebleRepository(IConfiguration config)
     public async Task<(List<Inmueble> Inmuebles, int Total)> BuscarDisponibles(BusquedaInmueblesFiltro filtro, int pagina, int limite)
     {
         // La consulta se resuelve por completo en la base: no se cargan inmuebles para filtrarlos en memoria.
-        const string desde = " FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo WHERE i.estado=true AND i.disponible=true AND NOT EXISTS (SELECT 1 FROM reservas r WHERE r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio<=@fin AND COALESCE(r.fecha_terminacion,r.fecha_fin)>=@inicio) AND (@tipo IS NULL OR i.id_tipo=@tipo) AND (@cupo IS NULL OR i.cupo>=@cupo) AND (@precio IS NULL OR i.precio_por_dia<=@precio) ";
+        const string desde = " FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo WHERE i.estado=true AND i.disponible=true AND NOT EXISTS (SELECT 1 FROM reservas r WHERE r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio<@fin AND COALESCE(r.fecha_terminacion,r.fecha_fin)>@inicio) AND (@tipo IS NULL OR i.id_tipo=@tipo) AND (@cupo IS NULL OR i.cupo>=@cupo) AND (@precio IS NULL OR i.precio_por_dia<=@precio) ";
         var total = 0;
         await using var conexion = CrearConexion(); await conexion.OpenAsync();
         await using (var cuenta = new MySqlCommand("SELECT COUNT(*)" + desde, conexion))
@@ -109,7 +109,7 @@ public class InmuebleRepository(IConfiguration config)
     public async Task<List<InmuebleReservado>> MasReservados()
     {
         var lista = new List<InmuebleReservado>(); await using var conexion = CrearConexion(); await conexion.OpenAsync();
-        const string sql = "SELECT i.*,p.nombre propietario_nombre,p.apellido propietario_apellido,t.descripcion tipo_descripcion,COUNT(r.id) cantidad_reservas FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo JOIN reservas r ON r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio>=DATE_SUB(CURDATE(),INTERVAL 365 DAY) WHERE i.estado=true GROUP BY i.id,p.nombre,p.apellido,t.descripcion ORDER BY cantidad_reservas DESC,i.direccion";
+        const string sql = "SELECT i.*,p.nombre propietario_nombre,p.apellido propietario_apellido,t.descripcion tipo_descripcion,COUNT(r.id) cantidad_reservas FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo JOIN reservas r ON r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio BETWEEN DATE_SUB(CURDATE(),INTERVAL 365 DAY) AND CURDATE() WHERE i.estado=true GROUP BY i.id,p.nombre,p.apellido,t.descripcion ORDER BY cantidad_reservas DESC,i.direccion";
         await using var comando = new MySqlCommand(sql, conexion); await using var lector = await comando.ExecuteReaderAsync();
         while (await lector.ReadAsync()) { var inmueble = Mapear(lector); lista.Add(new InmuebleReservado { Id=inmueble.Id, IdPropietario=inmueble.IdPropietario, Propietario=inmueble.Propietario, IdTipo=inmueble.IdTipo, Tipo=inmueble.Tipo, Direccion=inmueble.Direccion, Cupo=inmueble.Cupo, Coordenadas=inmueble.Coordenadas, PrecioPorDia=inmueble.PrecioPorDia, PorcentajeReserva=inmueble.PorcentajeReserva, ImagenPortada=inmueble.ImagenPortada, Disponible=inmueble.Disponible, Estado=inmueble.Estado, CantidadReservas=lector.GetInt32("cantidad_reservas") }); }
         return lista;
@@ -118,7 +118,7 @@ public class InmuebleRepository(IConfiguration config)
     public async Task<List<Inmueble>> SinReservasDesde(int dias)
     {
         var lista = new List<Inmueble>(); await using var conexion = CrearConexion(); await conexion.OpenAsync();
-        const string sql = "SELECT i.*,p.nombre propietario_nombre,p.apellido propietario_apellido,t.descripcion tipo_descripcion FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo WHERE i.estado=true AND NOT EXISTS (SELECT 1 FROM reservas r WHERE r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio>=DATE_SUB(CURDATE(),INTERVAL @dias DAY)) ORDER BY i.direccion,i.id";
+        const string sql = "SELECT i.*,p.nombre propietario_nombre,p.apellido propietario_apellido,t.descripcion tipo_descripcion FROM inmuebles i JOIN propietarios p ON p.id=i.id_propietario JOIN tipos_inmueble t ON t.id=i.id_tipo WHERE i.estado=true AND NOT EXISTS (SELECT 1 FROM reservas r WHERE r.id_inmueble=i.id AND r.estado=true AND r.fecha_inicio<=CURDATE() AND COALESCE(r.fecha_terminacion,r.fecha_fin)>DATE_SUB(CURDATE(),INTERVAL @dias DAY)) ORDER BY i.direccion,i.id";
         await using var comando = new MySqlCommand(sql, conexion); comando.Parameters.AddWithValue("@dias", dias); await using var lector = await comando.ExecuteReaderAsync(); while (await lector.ReadAsync()) lista.Add(Mapear(lector)); return lista;
     }
 
@@ -128,7 +128,9 @@ public class InmuebleRepository(IConfiguration config)
         var patron = "%" + (termino ?? "").Replace("!", "!!").Replace("%", "!%").Replace("_", "!_") + "%";
         var sql = entidad == "tipos"
             ? "SELECT id,descripcion texto FROM tipos_inmueble WHERE estado=true AND descripcion LIKE @buscar ESCAPE '!' ORDER BY descripcion,id LIMIT 20"
-            : "SELECT id,CONCAT(apellido,', ',nombre,' (DNI ',dni,')') texto FROM propietarios WHERE estado=true AND CONCAT(nombre,' ',apellido,' ',dni) LIKE @buscar ESCAPE '!' ORDER BY apellido,nombre,id LIMIT 20";
+            : entidad == "inmuebles"
+                ? "SELECT id,direccion texto FROM inmuebles WHERE estado=true AND disponible=true AND direccion LIKE @buscar ESCAPE '!' ORDER BY direccion,id LIMIT 20"
+                : "SELECT id,CONCAT(apellido,', ',nombre,' (DNI ',dni,')') texto FROM propietarios WHERE estado=true AND CONCAT(nombre,' ',apellido,' ',dni) LIKE @buscar ESCAPE '!' ORDER BY apellido,nombre,id LIMIT 20";
         var lista = new List<object>(); await using var conexion = CrearConexion(); await conexion.OpenAsync(); await using var comando = new MySqlCommand(sql, conexion); comando.Parameters.AddWithValue("@buscar", patron); await using var lector = await comando.ExecuteReaderAsync(); while (await lector.ReadAsync()) lista.Add(new { id=lector.GetInt32("id"), texto=lector.GetString("texto") }); return lista;
     }
 

@@ -1,6 +1,16 @@
 @model IEnumerable<Reserva>
 
-<h1>Reservas vigentes</h1>
+<h1>Reservas que terminan en los próximos @ViewBag.Dias días</h1>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto">
+        <label for="dias" class="form-label">Cantidad de días</label>
+        <input id="dias" name="dias" type="number" min="0" value="@ViewBag.Dias" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary">Consultar</button>
+    </div>
+</form>
 
 <table class="table table-striped">
 
