@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Renovar reserva";
+    var importeSena = ViewData.ModelState["importeSena"]?.AttemptedValue ?? string.Empty;
+    var fechaPago = ViewData.ModelState["fechaPago"]?.AttemptedValue
+        ?? DateTime.Today.ToString("yyyy-MM-dd");
 }
 
 <h1>Renovar reserva</h1>
@@ -69,12 +72,12 @@
                         Seña
                     </label>
 
-                    <input type="number"
+                    <input type="text"
                            name="importeSena"
-                           step="0.01"
-                           min="0"
+                           inputmode="decimal"
+                           placeholder="Ejemplo: 1500.00"
                            class="form-control"
-                           value="@ViewData["ImporteSena"]"
+                           value="@importeSena"
                            required />
 
                     @Html.ValidationMessage(
@@ -92,7 +95,7 @@
 
                     <input type="date"
                            name="fechaPago"
-                           value="@(((DateTime?)ViewData["FechaPago"] ?? DateTime.Today).ToString("yyyy-MM-dd"))"
+                           value="@fechaPago"
                            class="form-control"
                            required />
 

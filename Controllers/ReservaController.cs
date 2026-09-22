@@ -61,6 +61,7 @@ public class ReservaController(
     [HttpPost]
     public async Task<IActionResult> Crear(
         Reserva reserva,
+        [ModelBinder(BinderType = typeof(ImportePagoBinder))]
         decimal? importeSena,
         DateTime? fechaPago)
     {
@@ -236,6 +237,7 @@ public class ReservaController(
     [HttpPost]
     public async Task<IActionResult> Renovar(
         Reserva reserva,
+        [ModelBinder(BinderType = typeof(ImportePagoBinder))]
         decimal? importeSena,
         DateTime? fechaPago)
     {

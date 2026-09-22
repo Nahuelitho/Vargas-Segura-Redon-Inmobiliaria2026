@@ -1,3 +1,4 @@
+using System.Globalization;
 using Inmobiliaria.Models;
 
 namespace Inmobiliaria.Services;
@@ -25,7 +26,8 @@ public static class SenaService
     {
         var esperado = Calcular(reserva, porcentaje);
         if (importe != esperado)
-            throw new ArgumentException($"La seña debe ser de {esperado:N2}.");
+            throw new ArgumentException(
+                $"La seña ingresada no coincide. Importe requerido: {esperado.ToString("0.00", CultureInfo.InvariantCulture)}.");
         if (idUsuario <= 0 || fecha.Year < 1000 || importe > 99999999.99m)
             throw new ArgumentException("Los datos de la seña no son válidos.");
         // No se genera un pago de importe cero cuando no se exige seña.
